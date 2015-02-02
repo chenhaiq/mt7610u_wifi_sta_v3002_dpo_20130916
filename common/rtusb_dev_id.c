@@ -36,6 +36,7 @@
 /* module table */
 USB_DEVICE_ID rtusb_dev_id[] = {
 #ifdef MT76x0
+	{USB_DEVICE(0x148F,0x761a)}, /* MT7610U */
 	{USB_DEVICE(0x148F,0x7610)}, /* MT7610U */
 	{USB_DEVICE(0x0E8D,0x7610)}, /* MT7610U */
 	{USB_DEVICE_AND_INTERFACE_INFO(0x0E8D, 0x7630, 0xff, 0x2, 0xff)}, /* MT7630U */
