@@ -1,5 +1,5 @@
 # mt7610u_wifi_sta_v3002_dpo_20130916
-Modified usb wifi for TP_link TL-WDN5200 on Linux. 
+Modified usb wifi driver for TP_link TL-WDN5200 on Linux. 
 1. modified:   common/rtusb_dev_id.c 
  * add product id for TL-WDN5200
 1. modified:   include/os/rt_linux.h 
