@@ -668,7 +668,11 @@ ifeq ($(HAS_CSO_SUPPORT), y)
 WFLAGS += -DCONFIG_CSO_SUPPORT -DCONFIG_TSO_SUPPORT
 endif
 
-CHIPSET_DAT = 2870
+#Support für TP-Link T2U
+CHIPSET_DAT = 2860
+
+#Support for Linksys AE6000
+#CHIPSET_DAT = 2870
 endif
 
 ifneq ($(or $(findstring mt7662e,$(CHIPSET)),$(findstring mt7612e,$(CHIPSET))),)
