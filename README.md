@@ -22,6 +22,9 @@ to
 CHIPSET_DAT = 2870
 ```
 
+2860 is the value for TP-Link TL-WDN5200 AC600 T2U
+
+
 Ubuntu: sudo apt-get install git build-essential
 
 # how to use
