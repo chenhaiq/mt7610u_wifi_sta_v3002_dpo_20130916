@@ -14,9 +14,13 @@ Modified usb wifi driver for TP-Link TL-WDN5200 AC600 T2U and Cisco Linksys AE60
 
 #prepare
 Cisco Linksys AE6000: Change line 665 in os/linux/config.mk from 
+```
 CHIPSET_DAT = 2860
+```
 to
+```
 CHIPSET_DAT = 2870
+```
 
 Ubuntu: sudo apt-get install git build-essential
 
