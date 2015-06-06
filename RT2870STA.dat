@@ -2,11 +2,11 @@
 Default
 CountryRegion=5
 CountryRegionABand=7
-CountryCode=
+CountryCode=DE
 ChannelGeography=1
-SSID=LinksysAE6000-11n-ac-AP
+SSID=11n-AP
 NetworkType=Infra
-WirelessMode=13
+WirelessMode=5
 EfuseBufferMode=0
 Channel=0
 BeaconPeriod=100
