@@ -27,6 +27,8 @@
 
 #ifdef RTMP_MAC_USB
 
+#define usb_buffer_alloc(a, b, c, d) usb_alloc_coherent(a, b, c, d)
+#define usb_buffer_free(a, b, c, d) usb_free_coherent(a, b, c, d)
 
 #include	"rt_config.h"
 

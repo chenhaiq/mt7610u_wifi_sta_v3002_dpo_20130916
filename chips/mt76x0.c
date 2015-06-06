@@ -1573,7 +1573,7 @@ static VOID NICInitMT76x0RFRegisters(RTMP_ADAPTER *pAd)
 		E2: B0.R21<0>: xo_cxo<0>, B0.R22<7:0>: xo_cxo<8:1> 
 	*/
 	RFValue = (UCHAR)(pAd->RfFreqOffset & 0xFF);
-	RFValue = min(RFValue, 0xBF); /* Max of 9-bit built-in crystal oscillator C1 code */
+	RFValue = min(RFValue, (UCHAR)0xBF); /* Max of 9-bit built-in crystal oscillator C1 code */
 	rlt_rf_write(pAd, RF_BANK0, RF_R22, RFValue);
 	
 	rlt_rf_read(pAd, RF_BANK0, RF_R22, &RFValue);

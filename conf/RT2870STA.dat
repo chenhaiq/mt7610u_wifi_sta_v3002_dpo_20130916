@@ -2,7 +2,7 @@
 Default
 CountryRegion=5
 CountryRegionABand=7
-CountryCode=
+CountryCode=DE
 ChannelGeography=1
 SSID=11n-AP
 NetworkType=Infra
@@ -17,7 +17,7 @@ RTSThreshold=2347
 FragThreshold=2346
 TxBurst=1
 PktAggregate=0
-WmmCapable=1
+WmmCapable=0
 AckPolicy=0;0;0;0
 AuthMode=OPEN
 EncrypType=NONE

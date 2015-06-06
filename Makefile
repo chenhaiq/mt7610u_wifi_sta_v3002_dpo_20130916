@@ -14,7 +14,7 @@ endif
 # rt8592(for rt85592), mt7650e, mt7630e, mt7610e, mt7650u, mt7630u, mt7610u
 
 ifeq ($(CHIPSET),)
-CHIPSET = mt7650u mt7630u mt7610u
+CHIPSET = mt7610u
 endif
 
 MODULE = $(word 1, $(CHIPSET))
