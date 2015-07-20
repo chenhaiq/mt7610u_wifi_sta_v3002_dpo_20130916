@@ -28,3 +28,7 @@
 *.x86_64
 *.hex
 *~
+
+include/mcu/mt7650_firmware.h
+tools/bin2h
+
