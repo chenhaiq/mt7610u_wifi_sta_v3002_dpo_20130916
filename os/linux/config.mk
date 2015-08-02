@@ -839,6 +839,10 @@ endif
 
 #################################################
 
+ifeq ($(PLATFORM),RASP)
+EXTRA_CFLAGS := $(WFLAGS) -I$(RT28xx_DIR)/include
+endif
+
 
 ifeq ($(PLATFORM),5VT)
 #WFLAGS += -DCONFIG_5VT_ENHANCE
