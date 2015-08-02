@@ -14,7 +14,7 @@ endif
 # rt8592(for rt85592), mt7650e, mt7630e, mt7610e, mt7650u, mt7630u, mt7610u
 
 ifeq ($(CHIPSET),)
-CHIPSET = mt7610u
+CHIPSET = mt7650u mt7630u mt7610u
 endif
 
 MODULE = $(word 1, $(CHIPSET))
@@ -32,7 +32,8 @@ include $(RT28xx_DIR)/os/linux/config.mk
 RTMP_SRC_DIR = $(RT28xx_DIR)/RT$(MODULE)
 
 #PLATFORM: Target platform
-PLATFORM = PC
+#PLATFORM = PC
+PLATFORM = RASP
 #PLATFORM = 5VT
 #PLATFORM = IKANOS_V160
 #PLATFORM = IKANOS_V180
@@ -105,6 +106,15 @@ MODULE = $(shell pwd | sed "s/.*\///" ).o
 export MODULE
 endif
 
+ifeq ($(PLATFORM),RASP)
+LINUX_SRC = ~/raspi_cross/kernel
+CROSS_COMPILE = ~/raspi_cross/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-
+CROSS_COMPILE_INCLUDE = ~/raspi_cross/mt7610u_wifi_sta_v3002_dpo_20130916/include
+
+# /home/snowpin/armutils_2.5.120.1/toolchain/lib/gcc-lib/arm-elf/2.95.3
+endif
+
+
 ifeq ($(PLATFORM),5VT)
 LINUX_SRC = /home/ralink-2860-sdk-5vt-distribution/linux-2.6.17
 CROSS_COMPILE = /opt/crosstool/uClibc_v5te_le_gcc_4_1_1/bin/arm-linux-
@@ -135,6 +145,8 @@ LINUX_SRC = /home/snowpin/armutils_2.5.120.1/build_arm/linux-2.4.22-em86xx
 CROSS_COMPILE = /home/snowpin/armutils_2.5.120.1/toolchain/bin/arm-elf-
 CROSS_COMPILE_INCLUDE = /home/snowpin/armutils_2.5.120.1/toolchain/lib/gcc-lib/arm-elf/2.95.3
 endif
+
+
 
 ifeq ($(PLATFORM),INIC)
 UCOS_SRC = /opt/uCOS/iNIC_rt2880
@@ -532,6 +544,5 @@ endif
 
 # Declare the contents of the .PHONY variable as phony.  We keep that information in a variable
 .PHONY: $(PHONY)
-
 
 
