@@ -4,7 +4,7 @@ include $(RT28xx_DIR)/os/linux/config.mk
 #ifdef CONFIG_STA_SUPPORT
 ifeq ($(RT28xx_MODE), STA)
 MOD_NAME = rt$(MODULE)sta
-DAT_PATH = /etc/Wireless/RT$(MODULE_DAT)STA
+DAT_PATH = $(DESTDIR)/etc/Wireless/RT$(MODULE_DAT)STA
 DAT_FILE_NAME = RT$(MODULE_DAT)STA.dat
 endif
 #endif // CONFIG_STA_SUPPORT //
@@ -246,10 +246,8 @@ endif
 endif
 
 install:
-	rm -rf $(DAT_PATH)
-	$(shell [ ! -f /etc/Wireless ] && mkdir /etc/Wireless)
-	mkdir $(DAT_PATH)
-	cp $(RT28xx_DIR)/$(DAT_FILE_NAME) $(DAT_PATH)/.
+	install -d $(DAT_PATH)
+	install -m 644 -c $(RT28xx_DIR)/$(DAT_FILE_NAME) $(DAT_PATH)
 	install -d $(LINUX_SRC_MODULE)
 	install -m 644 -c $(addsuffix .o,$(MOD_NAME)) $(LINUX_SRC_MODULE)
 	/sbin/depmod -a ${shell uname -r}
