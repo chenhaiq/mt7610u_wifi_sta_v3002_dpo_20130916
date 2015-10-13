@@ -133,7 +133,7 @@ NDIS_STATUS	RTMPReadParametersHook(
 	if (src && *src)
 	{
 		RtmpOSFSInfoChange(&osFSInfo, TRUE);
-		srcf = RtmpOSFileOpen(src, O_RDONLY, 0);
+		srcf = RtmpOSFileOpen(src, RTMP_FILE_RDONLY, 0);
 		if (IS_FILE_OPEN_ERR(srcf))
 		{
 			DBGPRINT(RT_DEBUG_ERROR, ("Open file \"%s\" failed!\n", src));

@@ -1084,16 +1084,44 @@ int RtmpOSFileRead(RTMP_OS_FD osfd, char *pDataPtr, int readLen)
 {
 	/* The object must have a read method */
 	if (osfd->f_op && osfd->f_op->read) {
-		return osfd->f_op->read(osfd, pDataPtr, readLen, &osfd->f_pos);
-	} else {
-		DBGPRINT(RT_DEBUG_ERROR, ("no file read method\n"));
+		return osfd->f_op->read(osfd, pDataPtr, (size_t)readLen, &osfd->f_pos);
+	}
+	else
+	{
+		//* try vfs function(s)
+		int result;
+		mm_segment_t oldfs = get_fs();
+	    set_fs(KERNEL_DS);
+		result = vfs_read(osfd, pDataPtr, (size_t)readLen, &osfd->f_pos);
+		set_fs(oldfs);
+
+		if (result>=0)
+			return result;
+
+		DBGPRINT(RT_DEBUG_ERROR, ("no file read method, and vfs_read returns %d\n", result));
 		return -1;
 	}
 }
 
 int RtmpOSFileWrite(RTMP_OS_FD osfd, char *pDataPtr, int writeLen)
 {
-	return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	if (osfd->f_op && osfd->f_op->write) {
+		return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	}
+	else
+	{
+		// try vfs
+		int result;
+		mm_segment_t oldfs = get_fs();
+		set_fs(KERNEL_DS);
+		result = vfs_write(osfd, pDataPtr, (size_t)writeLen, &osfd->f_pos);
+		set_fs(oldfs);
+
+		if (result>=0)
+			return result;
+		DBGPRINT(RT_DEBUG_ERROR, ("no file write method, and vfs_write returns %d\n", result));
+		return -1;
+	}
 }
 
 static inline void __RtmpOSFSInfoChange(OS_FS_INFO * pOSFSInfo, BOOLEAN bSet)
