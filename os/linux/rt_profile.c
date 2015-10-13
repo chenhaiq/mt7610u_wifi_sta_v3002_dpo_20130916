@@ -34,24 +34,24 @@
 
 #ifdef SYSTEM_LOG_SUPPORT
 /* for wireless system event message */
-char const *pWirelessSysEventText[IW_SYS_EVENT_TYPE_NUM] = {    
+char const *pWirelessSysEventText[IW_SYS_EVENT_TYPE_NUM] = {
 	/* system status event */
     "had associated successfully",							/* IW_ASSOC_EVENT_FLAG */
     "had disassociated",									/* IW_DISASSOC_EVENT_FLAG */
     "had deauthenticated",									/* IW_DEAUTH_EVENT_FLAG */
     "had been aged-out and disassociated",					/* IW_AGEOUT_EVENT_FLAG */
-    "occurred CounterMeasures attack",						/* IW_COUNTER_MEASURES_EVENT_FLAG */	
+    "occurred CounterMeasures attack",						/* IW_COUNTER_MEASURES_EVENT_FLAG */
     "occurred replay counter different in Key Handshaking",	/* IW_REPLAY_COUNTER_DIFF_EVENT_FLAG */
     "occurred RSNIE different in Key Handshaking",			/* IW_RSNIE_DIFF_EVENT_FLAG */
     "occurred MIC different in Key Handshaking",			/* IW_MIC_DIFF_EVENT_FLAG */
     "occurred ICV error in RX",								/* IW_ICV_ERROR_EVENT_FLAG */
     "occurred MIC error in RX",								/* IW_MIC_ERROR_EVENT_FLAG */
-	"Group Key Handshaking timeout",						/* IW_GROUP_HS_TIMEOUT_EVENT_FLAG */ 
-	"Pairwise Key Handshaking timeout",						/* IW_PAIRWISE_HS_TIMEOUT_EVENT_FLAG */ 
-	"RSN IE sanity check failure",							/* IW_RSNIE_SANITY_FAIL_EVENT_FLAG */ 
-	"set key done in WPA/WPAPSK",							/* IW_SET_KEY_DONE_WPA1_EVENT_FLAG */ 
-	"set key done in WPA2/WPA2PSK",                         /* IW_SET_KEY_DONE_WPA2_EVENT_FLAG */ 
-	"connects with our wireless client",                    /* IW_STA_LINKUP_EVENT_FLAG */ 
+	"Group Key Handshaking timeout",						/* IW_GROUP_HS_TIMEOUT_EVENT_FLAG */
+	"Pairwise Key Handshaking timeout",						/* IW_PAIRWISE_HS_TIMEOUT_EVENT_FLAG */
+	"RSN IE sanity check failure",							/* IW_RSNIE_SANITY_FAIL_EVENT_FLAG */
+	"set key done in WPA/WPAPSK",							/* IW_SET_KEY_DONE_WPA1_EVENT_FLAG */
+	"set key done in WPA2/WPA2PSK",                         /* IW_SET_KEY_DONE_WPA2_EVENT_FLAG */
+	"connects with our wireless client",                    /* IW_STA_LINKUP_EVENT_FLAG */
 	"disconnects with our wireless client",                 /* IW_STA_LINKDOWN_EVENT_FLAG */
 	"scan completed",										/* IW_SCAN_COMPLETED_EVENT_FLAG */
 	"scan terminate!! Busy!! Enqueue fail!!",				/* IW_SCAN_ENQUEUE_FAIL_EVENT_FLAG */
@@ -67,7 +67,7 @@ char const *pWirelessSysEventText[IW_SYS_EVENT_TYPE_NUM] = {
 
 #ifdef IDS_SUPPORT
 /* for wireless IDS_spoof_attack event message */
-char const *pWirelessSpoofEventText[IW_SPOOF_EVENT_TYPE_NUM] = {   	
+char const *pWirelessSpoofEventText[IW_SPOOF_EVENT_TYPE_NUM] = {
     "detected conflict SSID",								/* IW_CONFLICT_SSID_EVENT_FLAG */
     "detected spoofed association response",				/* IW_SPOOF_ASSOC_RESP_EVENT_FLAG */
     "detected spoofed reassociation responses",				/* IW_SPOOF_REASSOC_RESP_EVENT_FLAG */
@@ -77,18 +77,18 @@ char const *pWirelessSpoofEventText[IW_SPOOF_EVENT_TYPE_NUM] = {
     "detected spoofed authentication",						/* IW_SPOOF_AUTH_EVENT_FLAG */
     "detected spoofed deauthentication",					/* IW_SPOOF_DEAUTH_EVENT_FLAG */
     "detected spoofed unknown management frame",			/* IW_SPOOF_UNKNOWN_MGMT_EVENT_FLAG */
-	"detected replay attack"								/* IW_REPLAY_ATTACK_EVENT_FLAG */	
+	"detected replay attack"								/* IW_REPLAY_ATTACK_EVENT_FLAG */
 	};
 
 /* for wireless IDS_flooding_attack event message */
-char const *pWirelessFloodEventText[IW_FLOOD_EVENT_TYPE_NUM] = {   	
+char const *pWirelessFloodEventText[IW_FLOOD_EVENT_TYPE_NUM] = {
 	"detected authentication flooding",						/* IW_FLOOD_AUTH_EVENT_FLAG */
     "detected association request flooding",				/* IW_FLOOD_ASSOC_REQ_EVENT_FLAG */
     "detected reassociation request flooding",				/* IW_FLOOD_REASSOC_REQ_EVENT_FLAG */
     "detected probe request flooding",						/* IW_FLOOD_PROBE_REQ_EVENT_FLAG */
     "detected disassociation flooding",						/* IW_FLOOD_DISASSOC_EVENT_FLAG */
     "detected deauthentication flooding",					/* IW_FLOOD_DEAUTH_EVENT_FLAG */
-    "detected 802.1x eap-request flooding"					/* IW_FLOOD_EAP_REQ_EVENT_FLAG */	
+    "detected 802.1x eap-request flooding"					/* IW_FLOOD_EAP_REQ_EVENT_FLAG */
 	};
 #endif /* IDS_SUPPORT */
 
@@ -116,8 +116,8 @@ NDIS_STATUS	RTMPReadParametersHook(
 	if(buffer == NULL)
 		return NDIS_STATUS_FAILURE;
 	memset(buffer, 0x00, MAX_INI_BUFFER_SIZE);
-			
-	{	
+
+	{
 
 #ifdef CONFIG_STA_SUPPORT
 		IF_DEV_CONFIG_OPMODE_ON_STA(pAd)
@@ -134,11 +134,11 @@ NDIS_STATUS	RTMPReadParametersHook(
 	{
 		RtmpOSFSInfoChange(&osFSInfo, TRUE);
 		srcf = RtmpOSFileOpen(src, O_RDONLY, 0);
-		if (IS_FILE_OPEN_ERR(srcf)) 
+		if (IS_FILE_OPEN_ERR(srcf))
 		{
 			DBGPRINT(RT_DEBUG_ERROR, ("Open file \"%s\" failed!\n", src));
 		}
-		else 
+		else
 		{
 			retval =RtmpOSFileRead(srcf, buffer, MAX_INI_BUFFER_SIZE);
 			if (retval > 0)
@@ -156,7 +156,7 @@ NDIS_STATUS	RTMPReadParametersHook(
 				DBGPRINT(RT_DEBUG_ERROR, ("Close file \"%s\" failed(errCode=%d)!\n", src, retval));
 			}
 		}
-		
+
 		RtmpOSFSInfoChange(&osFSInfo, FALSE);
 	}
 
@@ -165,7 +165,7 @@ NDIS_STATUS	RTMPReadParametersHook(
 		{
 			pAd->ApCfg.MBSSID[i].Hostapd=FALSE;
 			DBGPRINT(RT_DEBUG_TRACE, ("Reset ra%d hostapd support=FLASE", i));
-			
+
 		}
 #endif /*HOSTAPD_SUPPORT */
 
@@ -175,7 +175,7 @@ NDIS_STATUS	RTMPReadParametersHook(
 
 /*	kfree(buffer); */
 	os_free_mem(NULL, buffer);
-	
+
 	return (retval);
 
 }
@@ -184,13 +184,13 @@ NDIS_STATUS	RTMPReadParametersHook(
 #ifdef SYSTEM_LOG_SUPPORT
 /*
 	========================================================================
-	
+
 	Routine Description:
 		Send log message through wireless event
 
 		Support standard iw_event with IWEVCUSTOM. It is used below.
 
-		iwreq_data.data.flags is used to store event_flag that is defined by user. 
+		iwreq_data.data.flags is used to store event_flag that is defined by user.
 		iwreq_data.data.length is the length of the event log.
 
 		The format of the event log is composed of the entry's MAC address and
@@ -198,7 +198,7 @@ NDIS_STATUS	RTMPReadParametersHook(
 
 			ex: 11:22:33:44:55:66 has associated successfully
 
-		p.s. The requirement of Wireless Extension is v15 or newer. 
+		p.s. The requirement of Wireless Extension is v15 or newer.
 
 	========================================================================
 */
@@ -211,13 +211,13 @@ VOID RtmpDrvSendWirelessEvent(
 {
 	PRTMP_ADAPTER pAd = (PRTMP_ADAPTER)pAdSrc;
 	PSTRING	pBuf = NULL, pBufPtr = NULL;
-	USHORT	event, type, BufLen;	
+	USHORT	event, type, BufLen;
 	UCHAR	event_table_len = 0;
 
 	if (pAd->CommonCfg.bWirelessEvent == FALSE)
 		return;
 
-	type = Event_flag & 0xFF00;	
+	type = Event_flag & 0xFF00;
 	event = Event_flag & 0x00FF;
 
 	switch (type)
@@ -233,23 +233,23 @@ VOID RtmpDrvSendWirelessEvent(
 		case IW_FLOOD_EVENT_FLAG_START:
 			event_table_len = IW_FLOOD_EVENT_TYPE_NUM;
 			break;
-#endif /* IDS_SUPPORT */ 			
+#endif /* IDS_SUPPORT */
 #ifdef CONFIG_STA_SUPPORT
 #endif /* CONFIG_STA_SUPPORT */
 	}
-	
+
 	if (event_table_len == 0)
 	{
-		DBGPRINT(RT_DEBUG_ERROR, ("%s : The type(%0x02x) is not valid.\n", __FUNCTION__, type));			       		       		
+		DBGPRINT(RT_DEBUG_ERROR, ("%s : The type(%0x02x) is not valid.\n", __FUNCTION__, type));
 		return;
 	}
-	
+
 	if (event >= event_table_len)
 	{
-		DBGPRINT(RT_DEBUG_ERROR, ("%s : The event(%0x02x) is not valid.\n", __FUNCTION__, event));			       		       		
+		DBGPRINT(RT_DEBUG_ERROR, ("%s : The event(%0x02x) is not valid.\n", __FUNCTION__, event));
 		return;
-	}	
- 
+	}
+
 	/*Allocate memory and copy the msg. */
 /*	if((pBuf = kmalloc(IW_CUSTOM_MAX_LEN, GFP_ATOMIC)) != NULL) */
 	os_alloc_mem(NULL, (UCHAR **)&pBuf, IW_CUSTOM_MAX_LEN);
@@ -258,10 +258,10 @@ VOID RtmpDrvSendWirelessEvent(
 		/*Prepare the payload */
 		memset(pBuf, 0, IW_CUSTOM_MAX_LEN);
 
-		pBufPtr = pBuf;		
+		pBufPtr = pBuf;
 
 		if (pAddr)
-			pBufPtr += sprintf(pBufPtr, "(RT2860) STA(%02x:%02x:%02x:%02x:%02x:%02x) ", PRINT_MAC(pAddr));				
+			pBufPtr += sprintf(pBufPtr, "(RT2860) STA(%02x:%02x:%02x:%02x:%02x:%02x) ", PRINT_MAC(pAddr));
 		else if (BssIdx < MAX_MBSSID_NUM(pAd))
 			pBufPtr += sprintf(pBufPtr, "(RT2860) BSS(ra%d) ", BssIdx);
 		else
@@ -270,34 +270,34 @@ VOID RtmpDrvSendWirelessEvent(
 		if (type == IW_SYS_EVENT_FLAG_START)
         {
 			pBufPtr += sprintf(pBufPtr, "%s", pWirelessSysEventText[event]);
-		    
+
             if (Event_flag == IW_CHANNEL_CHANGE_EVENT_FLAG)
 		  	{
 			 	pBufPtr += sprintf(pBufPtr, "%3d", Rssi);
-			}			
+			}
 		}
-#ifdef IDS_SUPPORT		
+#ifdef IDS_SUPPORT
 		else if (type == IW_SPOOF_EVENT_FLAG_START)
 			pBufPtr += sprintf(pBufPtr, "%s (RSSI=%d)", pWirelessSpoofEventText[event], Rssi);
 		else if (type == IW_FLOOD_EVENT_FLAG_START)
 			pBufPtr += sprintf(pBufPtr, "%s", pWirelessFloodEventText[event]);
-#endif /* IDS_SUPPORT */		
+#endif /* IDS_SUPPORT */
 #ifdef CONFIG_STA_SUPPORT
 #endif /* CONFIG_STA_SUPPORT */
 		else
 			pBufPtr += sprintf(pBufPtr, "%s", "unknown event");
-		
+
 		pBufPtr[pBufPtr - pBuf] = '\0';
 		BufLen = pBufPtr - pBuf;
-		
+
 		RtmpOSWrielessEventSend(pAd->net_dev, RT_WLAN_EVENT_CUSTOM, Event_flag, NULL, (PUCHAR)pBuf, BufLen);
 		/*DBGPRINT(RT_DEBUG_TRACE, ("%s : %s\n", __FUNCTION__, pBuf)); */
-	
+
 /*		kfree(pBuf); */
 		os_free_mem(NULL, pBuf);
 	}
 	else
-		DBGPRINT(RT_DEBUG_ERROR, ("%s : Can't allocate memory for wireless event.\n", __FUNCTION__));			       		       				
+		DBGPRINT(RT_DEBUG_ERROR, ("%s : Can't allocate memory for wireless event.\n", __FUNCTION__));
 }
 #endif /* SYSTEM_LOG_SUPPORT */
 
@@ -305,7 +305,7 @@ VOID RtmpDrvSendWirelessEvent(
 void RTMP_IndicateMediaState(
 	IN	PRTMP_ADAPTER		pAd,
 	IN  NDIS_MEDIA_STATE	media_state)
-{	
+{
 	pAd->IndicateMediaState = media_state;
 
 #ifdef SYSTEM_LOG_SUPPORT
@@ -314,9 +314,9 @@ void RTMP_IndicateMediaState(
 			RTMPSendWirelessEvent(pAd, IW_STA_LINKUP_EVENT_FLAG, pAd->MacTab.Content[BSSID_WCID].Addr, BSS0, 0);
 		}
 		else
-		{							
-			RTMPSendWirelessEvent(pAd, IW_STA_LINKDOWN_EVENT_FLAG, pAd->MacTab.Content[BSSID_WCID].Addr, BSS0, 0); 		
-		}	
+		{
+			RTMPSendWirelessEvent(pAd, IW_STA_LINKDOWN_EVENT_FLAG, pAd->MacTab.Content[BSSID_WCID].Addr, BSS0, 0);
+		}
 #endif /* SYSTEM_LOG_SUPPORT */
 }
 
@@ -352,12 +352,12 @@ void announce_802_3_packet(
 #endif /* IKANOS_VX_1X0 */
 
 #ifdef INF_PPA_SUPPORT
-	if (ppa_hook_directpath_send_fn && pAd->PPAEnable==TRUE ) 
+	if (ppa_hook_directpath_send_fn && pAd->PPAEnable==TRUE )
 	{
 		RtmpOsPktInfPpaSend(pRxPkt);
 		pRxPkt=NULL;
 		return;
-	}	  	
+	}
 #endif /* INF_PPA_SUPPORT */
 
 	{
@@ -369,7 +369,7 @@ void announce_802_3_packet(
 		if(ra_classifier_hook_rx!= NULL)
 		{
 			unsigned int flags;
-			
+
 			RTMP_IRQ_LOCK(&pAd->page_lock, flags);
 			ra_classifier_hook_rx(pRxPkt, classifier_cur_cycle);
 			RTMP_IRQ_UNLOCK(&pAd->page_lock, flags);
@@ -389,11 +389,11 @@ void announce_802_3_packet(
 		if (ra_sw_nat_hook_rx!= NULL)
 		{
 			unsigned int flags;
-			
+
 			RtmpOsPktProtocolAssign(pRxPkt);
 
 			RTMP_IRQ_LOCK(&pAd->page_lock, flags);
-			if(ra_sw_nat_hook_rx(pRxPkt)) 
+			if(ra_sw_nat_hook_rx(pRxPkt))
 			{
 				RtmpOsPktRcvHandle(pRxPkt);
 			}
@@ -408,7 +408,7 @@ void announce_802_3_packet(
 		}
 #endif /* CONFIG_RA_NAT_NONE */
 	}
-	
+
 
 		RtmpOsPktProtocolAssign(pRxPkt);
 		RtmpOsPktRcvHandle(pRxPkt);
@@ -450,7 +450,7 @@ void STA_MonPktSend(
 						ConvertToRssi(pAd, pRxBlk->pRxWI->RxWIRSSI1, RSSI_1),
 						ConvertToRssi(pAd, pRxBlk->pRxWI->RxWIRSSI2, RSSI_2));
 
-	pNetDev = get_netdev_from_bssid(pAd, BSS0); 
+	pNetDev = get_netdev_from_bssid(pAd, BSS0);
 	pRxPacket = pRxBlk->pRxPacket;
 	pHeader = pRxBlk->pHeader;
 	pData = pRxBlk->pData;
@@ -479,7 +479,7 @@ void STA_MonPktSend(
 	return;
 
 err_free_sk_buff:
-	RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_FAILURE);	
+	RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_FAILURE);
 	return;
 }
 #endif /* CONFIG_STA_SUPPORT */
@@ -492,7 +492,7 @@ VOID	RTMPFreeAdapter(
 {
 	PRTMP_ADAPTER pAd = (PRTMP_ADAPTER)pAdSrc;
 	POS_COOKIE os_cookie;
-	int index;	
+	int index;
 
 	os_cookie=(POS_COOKIE)pAd->OS_Cookie;
 
@@ -501,7 +501,7 @@ VOID	RTMPFreeAdapter(
 
 
 	NdisFreeSpinLock(&pAd->MgmtRingLock);
-	
+
 
 #if defined(RT3290) || defined(RT65xx)
 #endif /* defined(RT3290) || defined(RT65xx) */
@@ -512,7 +512,7 @@ VOID	RTMPFreeAdapter(
 		NdisFreeSpinLock(&pAd->DeQueueLock[index]);
 		pAd->DeQueueRunning[index] = FALSE;
 	}
-	
+
 	NdisFreeSpinLock(&pAd->irq_lock);
 
 
