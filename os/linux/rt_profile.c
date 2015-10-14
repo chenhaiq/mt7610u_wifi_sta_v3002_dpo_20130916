@@ -136,21 +136,30 @@ NDIS_STATUS	RTMPReadParametersHook(
 		srcf = RtmpOSFileOpen(src, RTMP_FILE_RDONLY, 0);
 		if (IS_FILE_OPEN_ERR(srcf))
 		{
-			DBGPRINT(RT_DEBUG_ERROR, ("Open file \"%s\" failed!\n", src));
+			DBGPRINT(RT_DEBUG_ERROR, (KERN_ERR "Open file \"%s\" failed!\n", src));
 		}
 		else
 		{
-			retval =RtmpOSFileRead(srcf, buffer, MAX_INI_BUFFER_SIZE);
+			retval = RtmpOSFileRead(srcf, buffer, MAX_INI_BUFFER_SIZE);
 			if (retval > 0)
 			{
-				RTMPSetProfileParameters(pAd, buffer);
-				retval = NDIS_STATUS_SUCCESS;
+				if (retval < MAX_INI_BUFFER_SIZE)
+				{
+					RTMPSetProfileParameters(pAd, buffer);
+					retval = NDIS_STATUS_SUCCESS;
+				}
+				else
+				{
+					retval = NDIS_STATUS_FAILURE;
+					DBGPRINT(RT_DEBUG_ERROR, (KERN_ERR "Config file `%s' must be less then %d bytes!\n",
+						src, MAX_INI_BUFFER_SIZE));
+				}
 			}
 			else
-				DBGPRINT(RT_DEBUG_ERROR, ("Read file \"%s\" failed(errCode=%d)!\n", src, retval));
+				DBGPRINT(RT_DEBUG_ERROR, (KERN_ERR "Read file \"%s\" failed(err=%d)!\n", src, retval));
 
 			retval = RtmpOSFileClose(srcf);
-			if ( retval != 0)
+			if (retval != 0)
 			{
 				retval = NDIS_STATUS_FAILURE;
 				DBGPRINT(RT_DEBUG_ERROR, ("Close file \"%s\" failed(errCode=%d)!\n", src, retval));
@@ -334,9 +343,9 @@ void announce_802_3_packet(
 	RTMP_ADAPTER *pAd = (RTMP_ADAPTER *)pAdSrc;
 	PNDIS_PACKET pRxPkt = pPacket;
 
+	(void)(pAd);
 	ASSERT(pPacket);
 	MEM_DBG_PKT_FREE_INC(pPacket);
-
 
 
 #ifdef CONFIG_STA_SUPPORT
@@ -440,7 +449,7 @@ void STA_MonPktSend(
 
     if (pRxBlk->DataSize + sizeof(wlan_ng_prism2_header) > RX_BUFFER_AGGRESIZE)
     {
-        DBGPRINT(RT_DEBUG_ERROR, ("%s : Size is too large! (%d)\n", __FUNCTION__, pRxBlk->DataSize + sizeof(wlan_ng_prism2_header)));
+        DBGPRINT(RT_DEBUG_ERROR, ("%s : Size is too large! (%zd)\n", __FUNCTION__, pRxBlk->DataSize + sizeof(wlan_ng_prism2_header)));
 		goto err_free_sk_buff;
     }
 
