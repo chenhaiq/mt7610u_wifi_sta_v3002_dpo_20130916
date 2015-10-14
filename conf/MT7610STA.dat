@@ -1,0 +1,216 @@
+#The word of "Default" must not be removed
+# This configuration is taken from TP-Link Archer T2U aka TL-WDN5200
+Default
+CountryRegion=1
+#Country/Region(2.4GHz) 
+#"#0 (1 - 11)"
+#"#1 (1 - 13)"
+#"#2 (10 - 11)"
+#"#3 (10 - 13)"
+#"#4 (14)"
+#"#5 (1 - 14)"
+#"#6 (3 - 9)"
+#"#7 (5 - 13)"
+
+CountryRegionABand=0
+#Country/Region(5.0GHz) 
+#"#0 (36 - 64,149 - 165)"
+#"#1 (36 - 140)"
+#"#2 (36 - 64)"
+#"#3 (52 - 64,149 - 161)"
+#"#4 (149 - 165)"
+#"#5 (149 - 161)"
+#"#6 (36 - 48)"
+#"#7 (36 - 165)"
+#"#8 (52 - 64)"
+#"#9 (36 - 116,132 - 165)"
+#"#10 (36 - 48,149 - 165)"
+#"#11 (36 - 120,149 - 161)"
+#"#12 (36 - 140)"
+#"#13 (52 - 161)"
+#"#14 (36 - 116,136 - 165)"
+#"#15 (149 - 173)"
+#"#16 (36 - 173)"
+#"#17 (36 - 64,132 - 140)"
+
+CountryCode=
+#{AG, AR, AW, AU, AT, BS, BB, BM, BR, BE, BG, CA, KY, CL, CN, CO, CR, CY, CZ, DK, DO, EC, SV, FI, FR, DE, GR, }
+#{GU, GT, HT, HN, HK, HU, IS, IN, ID, E, IL, IT, JP, JO, LV, LI, LT, LU, MY, MT, MA, MX, NL, NZ, NO, PE, PT, }
+#{PL, RO, RU, SA, CS, SG, SK, SI, ZA, KR, ES, SE, CH, TW, TR, GB, UA, AE, US, VE}
+
+ChannelGeography=1
+
+SSID=MyNetwork
+#{0~z, less than 32 characters} Set access point SSID
+
+NetworkType=Infra
+#{Infra,Adhoc}
+
+WirelessMode=5
+#5 - "Both"
+#8 - "5G"
+#9 - "2.4G"
+#{0: legacy 11b/g mixed}
+#{1: legacy 11b only}
+#{2: legacy 11a only}
+#{3: legacy 11a/b/g mixed}
+#{4: legacy 11g only}
+#{5: 11a/b/g/n mixed}
+#{6: 11n only}
+#{7: 11g/n mixed}
+#{8: 11a/n mixed}
+#{9: 11b/g/n mixed}
+#{10: 11a/g/n mixed}
+
+Channel=0
+BeaconPeriod=80
+TxPower=20
+BGProtection=0
+# {0:Auto, 1:Always on, 2:Always off}
+
+TxPreamble=2
+#{0:Preamble Long, 1:Preamble Short, 2:Auto}
+
+TxRate=0
+#{0: Auto       //WirelessMode=0~4}
+#{1: 1 Mbps   //WirelessMode=0 or 1 or 3}
+#{2: 2 Mbps   //WirelessMode=0 or 1 or 3}
+#{3: 5.5 Mbps    //WirelessMode=0 or 1 or 3}
+#{4: 11 Mbps    //WirelessMode=0 or 1 or 3}
+#{5: 6  Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{6: 9  Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{7: 12 Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{8: 18 Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{9: 24 Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{10: 36 Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{11: 48 Mbps     //WirelessMode=0 or 2 or 3 or 4}
+#{12: 54 Mbps     //WirelessMode=0 or 2 or 3 or 4}
+
+RTSThreshold=2312
+#{Configuring the RTS Threshold}
+
+FragThreshold=2346
+#{a value between 256~2346}
+
+TxBurst=1
+#{0: Disable, 1: Enable}
+
+PktAggregate=0
+#{0: Disable, 1: Enable when the peer supports it}
+
+WmmCapable=1
+#{0: Disable WMM, 1: Enable WMM}
+#{Set it as 1 to turn on WMM Qos support}
+
+AckPolicy=0;0;0;0
+#{Set ACs corresponding BE, BK, VI and VO as delivery-enabled or delivery-disabled}
+#{ AC_BE  AC_BK  AC_VI  AC_VO }
+#{ {0,1}; {0,1}; {0,1}; {0,1}
+
+AuthMode=OPEN
+#{OPEN    For open system}
+#{SHARED    For shared key system}
+#{WEPAUTO Auto switch between OPEN and SHARED}
+#{WPAPSK  For WPA pre-shared key  (Infra)}
+#{WPA2PSK For WPA2 pre-shared key (Infra)}
+#{WPANONE For WPA pre-shared key  (Adhoc)}
+#{WPA     Use WPA_Supplicant}
+#{WPA2    Use WPA_Supplicant}
+
+EncrypType=NONE
+#{NONE}
+#{WEP}
+#{TKIP}
+#{AES}
+
+WPAPSK=
+#{8~63 ASCII or 64 HEX characters} (WPA Pre-Shared Key)
+
+DefaultKeyID=1
+#{1~4} Set Default Key ID (create one to four on the next lines)
+
+Key1Type=0
+#{0 hexadecimal type, 1 assci type}
+
+Key1Str=
+#{10 or 26 characters (key type=0), 5 or 13 characters  (key type=1)}
+
+Key2Type=0
+#{0 hexadecimal type, 1 assci type}
+
+Key2Str=
+#{10 or 26 characters (key type=0), 5 or 13 characters  (key type=1)}
+
+Key3Type=0
+#{0 hexadecimal type, 1 assci type}
+
+Key3Str=
+#{10 or 26 characters (key type=0), 5 or 13 characters  (key type=1)}
+
+Key4Type=0
+#{0 hexadecimal type, 1 assci type}
+
+Key4Str=
+#{10 or 26 characters (key type=0), 5 or 13 characters  (key type=1)}
+
+PSMode=CAM
+#{CAM = Constantly Awake Mode, Fast_PSP = Power Save Mode, MAX_PSP = Max power save mode}
+
+AutoRoaming=0
+#{0: Disable Roaming, 1: Enable Roaming}
+
+RoamThreshold=70
+#{value between 60~90}
+
+APSDCapable=0
+#{0: Disable APSD, 1: Enable APSD (Only valid on WmmCapable=1)}
+#{Set it as 1 to use automatic power-save delivery(APSD) on an Non-AP QSTA}
+
+APSDAC=0;0;0;0
+#{0: Delivery-disabled AC, 1: Delivery-enabled AC (Only valid on APSDCapable=1)}
+#{Set ACs corresponding BE, BK, VI and VO as delivery-enabled or delivery-disabled}
+#{ AC_BE  AC_BK  AC_VI  AC_VO }
+#{ {0,1}; {0,1}; {0,1}; {0,1}
+
+IEEE80211H=1
+#{0: Disable, 1:   Enable Spectrum management (This field can be enable only in A band)}
+
+HT_RDG=1
+HT_EXTCHA=0
+HT_OpMode=0
+HT_MpduDensity=4
+HT_BW=1
+HT_BADecline=0
+HT_AutoBA=1
+HT_AMSDU=0
+HT_BAWinSize=64
+HT_GI=1
+HT_MCS=33
+HT_MIMOPSMode=3
+HT_DisallowTKIP=1
+EthConvertMode=
+EthCloneMac=
+TGnWifiTest=0
+WirelessEvent=0
+MeshId=MESH
+MeshAutoLink=1
+MeshAuthMode=OPEN
+MeshEncrypType=NONE
+MeshWPAKEY=
+MeshDefaultkey=1
+MeshWEPKEY=
+CarrierDetect=0
+AntDiversity=0
+BeaconLostTime=4
+FtSupport=0
+Wapiifname=ra0
+WapiPsk=
+WapiPskType=
+WapiUserCertPath=
+WapiAsCertPath=
+PSP_XLINK_MODE=0
+WscManufacturer=
+WscModelName=
+WscDeviceName=
+WscModelNumber=
+WscSerialNumber=

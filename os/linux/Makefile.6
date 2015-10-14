@@ -99,7 +99,7 @@ endif
 ifeq ($(PLATFORM),MT53XX)
 MOD_NAME = rtsta
 endif
-DAT_PATH = /etc/Wireless/RT$(CHIPSET_DAT)STA
+DAT_PATH = $(DESTDIR)/etc/Wireless/RT$(CHIPSET_DAT)STA
 DAT_FILE_NAME = conf/RT$(CHIPSET_DAT)STA.dat
 endif
 #endif // CONFIG_STA_SUPPORT //
@@ -451,16 +451,15 @@ endif
 endif
 
 install:
-	rm -rf $(DAT_PATH)
-	$(shell [ ! -f /etc/Wireless ] && mkdir /etc/Wireless)
-	mkdir $(DAT_PATH)
-	cp $(RT28xx_DIR)/$(DAT_FILE_NAME) $(DAT_PATH)/.
+	install -d $(DAT_PATH)
+	install -m 644 -c $(RT28xx_DIR)/$(DAT_FILE_NAME) $(DAT_PATH)
 	install -d $(LINUX_SRC_MODULE)
 	install -m 644 -c $(addsuffix .ko,$(MOD_NAME)) $(LINUX_SRC_MODULE)
 	/sbin/depmod -a ${shell uname -r}
 
 uninstall:
 #	rm -rf $(DAT_PATH)
+	rmmod $(MOD_NAME)
 	rm -rf $(addprefix $(LINUX_SRC_MODULE),$(addsuffix .ko,$(MOD_NAME)))
 	/sbin/depmod -a ${shell uname -r}
 
