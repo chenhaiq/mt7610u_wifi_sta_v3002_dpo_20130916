@@ -1,4 +1,8 @@
 # mt7610u_wifi_sta_v3002_dpo_20130916
+
+Modified for TP-Link Archer T2U and RaspberryPi2 4.1.7-v7+ armv7l kernel
+* os/linux/rt_linux.c
+
 Modified usb wifi driver for TP_link TL-WDN5200 on Linux. 
 1. modified:   common/rtusb_dev_id.c 
  * add product id for TL-WDN5200
@@ -13,8 +17,7 @@ Modified usb wifi driver for TP_link TL-WDN5200 on Linux.
 ```
 $ make
 $ make install
-$ cp RT2870STA.dat  /etc/Wireless/RT2870STA/RT2870STA.dat
+$ cp RT2870STA.dat /etc/Wireless/RT2870STA/RT2870STA.dat
 $ reboot
 ```
-refer to： http://hprath.com/2014/06/cisco-linksys-ae6000-ac580-media-tek-mt7610u-mt7630u-mt7650u-linux-x64-driver-patch/
 
