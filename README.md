@@ -4,7 +4,7 @@ Modified for RaspberryPI2 kernel 4.1.7-v7+ armv7l GNU/Linux
 * modified: os/linux/rt_linux.c
  * fix file operations
 
-Modified usb wifi driver for TP_link TL-WDN5200 on Linux. 
+Modified usb wifi driver for TP-Link TL-WDN5200/Archer T2U on Linux. 
 * modified: common/rtusb_dev_id.c 
  * add product id for TL-WDN5200/Archer T2U
 * modified: include/os/rt_linux.h 
