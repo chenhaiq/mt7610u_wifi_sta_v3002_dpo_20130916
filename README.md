@@ -1,16 +1,17 @@
 # mt7610u_wifi_sta_v3002_dpo_20130916
 
-Modified for TP-Link Archer T2U and RaspberryPi2 4.1.7-v7+ armv7l kernel
-* os/linux/rt_linux.c
+Modified for RaspberryPI2 kernel 4.1.7-v7+ armv7l GNU/Linux
+* modified: os/linux/rt_linux.c
+ * fix file operations
 
 Modified usb wifi driver for TP_link TL-WDN5200 on Linux. 
-1. modified:   common/rtusb_dev_id.c 
- * add product id for TL-WDN5200
-1. modified:   include/os/rt_linux.h 
-1. modified:   os/linux/rt_linux.c
+* modified: common/rtusb_dev_id.c 
+ * add product id for TL-WDN5200/Archer T2U
+* modified: include/os/rt_linux.h 
+* modified: os/linux/rt_linux.c
  * fix compile error from struct _OS_FS_INFO_
  * fix problem on 64bit
-1. modified:   os/linux/config.mk
+* modified: os/linux/config.mk
  * change default setting for Ubuntu 
 
 # how to use
