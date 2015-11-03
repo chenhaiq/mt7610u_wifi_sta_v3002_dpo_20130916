@@ -15,7 +15,8 @@ Modified usb wifi driver for TP-Link TL-WDN5200/Archer T2U on Linux.
  * change default setting for Ubuntu 
 
 kernel headers 4.1.7-v7+ armv7l GNU/Linux
-http://www.niksula.hut.fi/~mhiienka/Rpi/linux-headers-rpi/linux-headers-4.0.7-v7%2B_4.0.7-v7%2B-2_armhf.deb
+
+http://www.niksula.hut.fi/~mhiienka/Rpi/linux-headers-rpi/linux-headers-4.1.7-v7%2B_4.1.7-v7%2B-2_armhf.deb
 
 # how to use
 ```
