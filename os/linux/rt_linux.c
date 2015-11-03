@@ -1083,8 +1083,8 @@ void RtmpOSFileSeek(RTMP_OS_FD osfd, int offset)
 int RtmpOSFileRead(RTMP_OS_FD osfd, char *pDataPtr, int readLen)
 {
 	/* The object must have a read method */
-	if (osfd->f_op && osfd->f_op->read) {
-		return osfd->f_op->read(osfd, pDataPtr, readLen, &osfd->f_pos);
+	if (osfd->f_op) {
+		return __vfs_read(osfd, pDataPtr, readLen, &osfd->f_pos);
 	} else {
 		DBGPRINT(RT_DEBUG_ERROR, ("no file read method\n"));
 		return -1;
@@ -1093,7 +1093,7 @@ int RtmpOSFileRead(RTMP_OS_FD osfd, char *pDataPtr, int readLen)
 
 int RtmpOSFileWrite(RTMP_OS_FD osfd, char *pDataPtr, int writeLen)
 {
-	return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	return __vfs_write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
 }
 
 static inline void __RtmpOSFSInfoChange(OS_FS_INFO * pOSFSInfo, BOOLEAN bSet)
@@ -1930,7 +1930,7 @@ VOID RtmpDrvAllMacPrint(
 			 ("-->2) %s: Error %ld opening %s\n", __FUNCTION__,
 			  -PTR_ERR(file_w), fileName));
 	} else {
-		if (file_w->f_op && file_w->f_op->write) {
+		if (file_w->f_op) {
 			file_w->f_pos = 0;
 			macAddr = AddrStart;
 
@@ -1940,7 +1940,7 @@ VOID RtmpDrvAllMacPrint(
 				sprintf(msg, "0x%04X = 0x%08X\n", macAddr, macValue);
 
 				/* write data to file */
-				file_w->f_op->write(file_w, msg, strlen(msg), &file_w->f_pos);
+				__vfs_write(file_w, msg, strlen(msg), &file_w->f_pos);
 
 				printk("%s", msg);
 				macAddr += AddrStep;
@@ -1981,7 +1981,7 @@ VOID RtmpDrvAllE2PPrint(
 			 ("-->2) %s: Error %ld opening %s\n", __FUNCTION__,
 			  -PTR_ERR(file_w), fileName));
 	} else {
-		if (file_w->f_op && file_w->f_op->write) {
+		if (file_w->f_op) {
 			file_w->f_pos = 0;
 			eepAddr = 0x00;
 
@@ -1990,7 +1990,7 @@ VOID RtmpDrvAllE2PPrint(
 				sprintf(msg, "%08x = %04x\n", eepAddr, eepValue);
 
 				/* write data to file */
-				file_w->f_op->write(file_w, msg, strlen(msg), &file_w->f_pos);
+				__vfs_write(file_w, msg, strlen(msg), &file_w->f_pos);
 
 				printk("%s", msg);
 				eepAddr += AddrStep;
@@ -2026,10 +2026,10 @@ VOID RtmpDrvAllRFPrint(
 			 ("-->2) %s: Error %ld opening %s\n", __FUNCTION__,
 			  -PTR_ERR(file_w), fileName));
 	} else {
-		if (file_w->f_op && file_w->f_op->write) {
+		if (file_w->f_op) {
 			file_w->f_pos = 0;
 			/* write data to file */
-			file_w->f_op->write(file_w, pBuf, BufLen, &file_w->f_pos);
+			__vfs_write(file_w, pBuf, BufLen, &file_w->f_pos);
 		}
 		filp_close(file_w, NULL);
 	}
