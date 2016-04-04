@@ -2,7 +2,7 @@
 Default
 CountryRegion=5
 CountryRegionABand=7
-CountryCode=DE
+CountryCode=
 ChannelGeography=1
 SSID=11n-AP
 NetworkType=Infra

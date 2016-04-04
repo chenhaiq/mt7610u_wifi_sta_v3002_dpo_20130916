@@ -553,6 +553,19 @@ VOID RTMP_P2P_Remove(
 	RTMP_COM_IoctlHandle(__pAd, NULL, CMD_RTPRIV_IOCTL_80211_SURVEY_GET, 0, __pSurveyInfo, 0)
 #define RTMP_DRIVER_80211_PMKID_CTRL(__pAd, __pPmkidInfo)				\
 	RTMP_STA_IoctlHandle(__pAd, NULL, CMD_RTPRIV_IOCTL_STA_SIOCSIWPMKSA, 0, __pPmkidInfo, 0, 0);
+
+#define RTMP_DRIVER_80211_BEACON_DEL(__pAd) \
+	RTMP_COM_IoctlHandle(__pAd, NULL, CMD_RTPRIV_IOCTL_80211_BEACON_DEL, 0, NULL, 0)
+
+#define RTMP_DRIVER_80211_BEACON_ADD(__pAd, __pBeacon) \
+   	RTMP_COM_IoctlHandle(__pAd, NULL, CMD_RTPRIV_IOCTL_80211_BEACON_ADD, 0, __pBeacon, 0)
+   	
+#define RTMP_DRIVER_80211_BEACON_SET(__pAd, __pBeacon) \
+	RTMP_COM_IoctlHandle(__pAd, NULL, CMD_RTPRIV_IOCTL_80211_BEACON_SET, 0, __pBeacon, 0)
+
+#define RTMP_DRIVER_80211_GEN_IE_SET(__pAd, __pData, __Len)    \
+    RTMP_STA_IoctlHandle(__pAd, NULL, CMD_RTPRIV_IOCTL_STA_SIOCSIWGENIE, 0, __pData, __Len, 0)	
+
 #endif /* RT_CFG80211_SUPPORT */
 
 /* mesh */

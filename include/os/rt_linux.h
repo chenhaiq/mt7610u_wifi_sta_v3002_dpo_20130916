@@ -277,8 +277,17 @@ typedef struct file* RTMP_OS_FD;
 
 typedef struct _OS_FS_INFO_
 {
+// https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/commit/include/linux/uidgid.h?id=7a4e7408c5cadb240e068a662251754a562355e3
+// https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/include/linux?h=linux-3.4.y
+// https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/include/linux?h=linux-3.5.y
+// (uidgid.h)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,5,0)
+ 	int				fsuid;
+ 	int				fsgid;
+#else
 	kuid_t				fsuid;
 	kgid_t				fsgid;
+#endif
 	mm_segment_t	fs;
 } OS_FS_INFO;
 

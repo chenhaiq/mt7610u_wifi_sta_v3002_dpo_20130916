@@ -2999,6 +2999,36 @@ struct _RTMP_ADAPTER {
 
 /*=========AP=========== */
 
+
+#ifdef CONFIG_AP_SUPPORT
+	/* ----------------------------------------------- */
+	/* AP specific configuration & operation status */
+	/* used only when pAd->OpMode == OPMODE_AP */
+	/* ----------------------------------------------- */
+	AP_ADMIN_CONFIG ApCfg;	/* user configuration when in AP mode */
+	AP_MLME_AUX ApMlmeAux;
+
+
+
+#ifdef MBSS_SUPPORT
+	BOOLEAN FlgMbssInit;
+#endif /* MBSS_SUPPORT */
+
+
+#ifdef APCLI_SUPPORT
+	BOOLEAN flg_apcli_init;
+#endif /* APCLI_SUPPORT */
+
+/*#ifdef AUTO_CH_SELECT_ENHANCE */
+	PBSSINFO pBssInfoTab;
+	PCHANNELINFO pChannelInfo;
+/*#endif // AUTO_CH_SELECT_ENHANCE */
+
+
+#endif /* CONFIG_AP_SUPPORT */
+
+
+
 /*=======STA=========== */
 #ifdef CONFIG_STA_SUPPORT
 	/* ----------------------------------------------- */
@@ -3950,6 +3980,9 @@ NDIS_STATUS	RTMPReadParametersHook(
 NDIS_STATUS	RTMPSetProfileParameters(
 	IN RTMP_ADAPTER *pAd,
 	IN PSTRING		pBuffer);
+
+NDIS_STATUS	RTMPSetDefaultProfileParameters(
+	IN RTMP_ADAPTER *pAd);
 
 #ifdef SINGLE_SKU_V2
 NDIS_STATUS	RTMPSetSingleSKUParameters(
@@ -7808,6 +7841,8 @@ INT Set_EncrypType_Proc(
 INT Set_DefaultKeyID_Proc(
     IN  PRTMP_ADAPTER   pAdapter, 
     IN  PSTRING          arg);
+
+INT Set_Wep_Key_Proc(RTMP_ADAPTER  *pAd, PSTRING Key, INT KeyLen, INT KeyId);
 
 INT Set_Key1_Proc(
     IN  PRTMP_ADAPTER   pAdapter, 

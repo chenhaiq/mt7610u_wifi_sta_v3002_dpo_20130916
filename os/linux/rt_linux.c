@@ -49,7 +49,7 @@
 #define RT_CONFIG_IF_OPMODE_ON_STA(__OpMode)
 #endif
 
-ULONG RTDebugLevel = RT_DEBUG_ERROR;
+extern ULONG RTDebugLevel; // moved to rt_main_dev.c
 ULONG RTDebugFunc = 0;
 
 #ifdef OS_ABL_FUNC_SUPPORT
@@ -1083,28 +1083,22 @@ void RtmpOSFileSeek(RTMP_OS_FD osfd, int offset)
 int RtmpOSFileRead(RTMP_OS_FD osfd, char *pDataPtr, int readLen)
 {
 	/* The object must have a read method */
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0)
 	if (osfd->f_op && osfd->f_op->read) {
 		return osfd->f_op->read(osfd, pDataPtr, readLen, &osfd->f_pos);
 	} else {
-		DBGPRINT(RT_DEBUG_ERROR, ("no file read method\n"));
-#else
-	if (osfd && osfd->f_mode & FMODE_CAN_READ) {
-	return __vfs_read(osfd, pDataPtr, readLen, &osfd->f_pos);
-	} else {
-		DBGPRINT(RT_DEBUG_ERROR, ("no file read method\n"));
-#endif
-	return -1;
+		DBGPRINT(RT_DEBUG_ERROR, ("no file read method, using vfs_read\n"));
+		return vfs_read(osfd, pDataPtr, readLen, &osfd->f_pos);
 	}
 }
 
 int RtmpOSFileWrite(RTMP_OS_FD osfd, char *pDataPtr, int writeLen)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0)
-	return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
-#else
-	return __vfs_write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
-#endif
+	if (osfd->f_op && osfd->f_op->write) {
+		return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	} else {
+		DBGPRINT(RT_DEBUG_ERROR, ("no file write method, using vfs_write\n"));
+		return vfs_write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	}
 }
 
 static inline void __RtmpOSFSInfoChange(OS_FS_INFO * pOSFSInfo, BOOLEAN bSet)
@@ -1662,7 +1656,14 @@ void RtmpOSNetDevDetach(PNET_DEV pNetDev)
 	struct net_device_ops *pNetDevOps = (struct net_device_ops *)pNetDev->netdev_ops;
 #endif
 
-	unregister_netdev(pNetDev);
+	printk("RtmpOSNetDevDetach: enter\n");
+
+	if (pNetDev->reg_state == NETREG_REGISTERED)
+	{
+		// Use unregister_netdev() instead of unregister_netdevice(), which locks RTNL for us
+		printk("RtmpOSNetDevDetach: unregister_netdev\n");
+		unregister_netdev(pNetDev);
+	}
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,31)
 	vfree(pNetDevOps);
@@ -1942,23 +1943,21 @@ VOID RtmpDrvAllMacPrint(
 			 ("-->2) %s: Error %ld opening %s\n", __FUNCTION__,
 			  -PTR_ERR(file_w), fileName));
 	} else {
-		if (file_w->f_op && file_w->f_op->write) {
-			file_w->f_pos = 0;
-			macAddr = AddrStart;
+		file_w->f_pos = 0;
+		macAddr = AddrStart;
 
-			while (macAddr <= AddrEnd) {
+		while (macAddr <= AddrEnd) {
 /*				RTMP_IO_READ32(pAd, macAddr, &macValue); // sample */
-				macValue = *pBufMac++;
-				sprintf(msg, "0x%04X = 0x%08X\n", macAddr, macValue);
+			macValue = *pBufMac++;
+			sprintf(msg, "0x%04X = 0x%08X\n", macAddr, macValue);
 
-				/* write data to file */
-				file_w->f_op->write(file_w, msg, strlen(msg), &file_w->f_pos);
+			/* write data to file */
+			RtmpOSFileWrite(file_w, msg, strlen(msg));
 
-				printk("%s", msg);
-				macAddr += AddrStep;
-			}
-			sprintf(msg, "\nDump all MAC values to %s\n", fileName);
+			printk("%s", msg);
+			macAddr += AddrStep;
 		}
+		sprintf(msg, "\nDump all MAC values to %s\n", fileName);
 		filp_close(file_w, NULL);
 	}
 	set_fs(orig_fs);
@@ -1993,24 +1992,22 @@ VOID RtmpDrvAllE2PPrint(
 			 ("-->2) %s: Error %ld opening %s\n", __FUNCTION__,
 			  -PTR_ERR(file_w), fileName));
 	} else {
-		if (file_w->f_op && file_w->f_op->write) {
-			file_w->f_pos = 0;
-			eepAddr = 0x00;
+		file_w->f_pos = 0;
+		eepAddr = 0x00;
 
-			while (eepAddr <= AddrEnd) {
-				eepValue = *pMacContent;
-				sprintf(msg, "%08x = %04x\n", eepAddr, eepValue);
+		while (eepAddr <= AddrEnd) {
+			eepValue = *pMacContent;
+			sprintf(msg, "%08x = %04x\n", eepAddr, eepValue);
 
-				/* write data to file */
-				file_w->f_op->write(file_w, msg, strlen(msg), &file_w->f_pos);
+			/* write data to file */
+			RtmpOSFileWrite(file_w, msg, strlen(msg));
 
-				printk("%s", msg);
-				eepAddr += AddrStep;
-				pMacContent += (AddrStep >> 1);
-			}
-			sprintf(msg, "\nDump all EEPROM values to %s\n",
-				fileName);
+			printk("%s", msg);
+			eepAddr += AddrStep;
+			pMacContent += (AddrStep >> 1);
 		}
+		sprintf(msg, "\nDump all EEPROM values to %s\n",
+			fileName);
 		filp_close(file_w, NULL);
 	}
 	set_fs(orig_fs);
@@ -2026,7 +2023,6 @@ VOID RtmpDrvAllRFPrint(
 	struct file *file_w;
 	PSTRING fileName = "RFDump.txt";
 	mm_segment_t orig_fs;
-	UINT32 macAddr = 0, macValue = 0;
 	
 	orig_fs = get_fs();
 	set_fs(KERNEL_DS);
@@ -2038,11 +2034,9 @@ VOID RtmpDrvAllRFPrint(
 			 ("-->2) %s: Error %ld opening %s\n", __FUNCTION__,
 			  -PTR_ERR(file_w), fileName));
 	} else {
-		if (file_w->f_op && file_w->f_op->write) {
-			file_w->f_pos = 0;
-			/* write data to file */
-			file_w->f_op->write(file_w, pBuf, BufLen, &file_w->f_pos);
-		}
+		file_w->f_pos = 0;
+		/* write data to file */
+		RtmpOSFileWrite(file_w, (char*)pBuf, BufLen);
 		filp_close(file_w, NULL);
 	}
 	set_fs(orig_fs);
@@ -2567,6 +2561,7 @@ VOID CFG80211OS_UnRegister(
 #ifdef RFKILL_HW_SUPPORT
 		wiphy_rfkill_stop_polling(pCfg80211_CB->pCfg80211_Wdev->wiphy);
 #endif /* RFKILL_HW_SUPPORT */
+
 		wiphy_unregister(pCfg80211_CB->pCfg80211_Wdev->wiphy);
 		wiphy_free(pCfg80211_CB->pCfg80211_Wdev->wiphy);
 		kfree(pCfg80211_CB->pCfg80211_Wdev);
@@ -2693,8 +2688,20 @@ BOOLEAN CFG80211_SupBandInit(
 	/* init channel */
 	for(IdLoop=0; IdLoop<NumOfChan; IdLoop++)
 	{
+		// @andy 2/24/2016
+		// 2.6.39 is the first kernel with ieee80211_channel_to_frequency requiring two parameters
+		// https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/include/net/cfg80211.h?h=linux-2.6.38.y
+		// https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/include/net/cfg80211.h?h=linux-2.6.39.y
+		// http://www.infty.nl/wordpress/2011/0/
+		// https://github.com/coolshou/mt7610u/pull/1/files?diff=split
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39))
 		pChannels[IdLoop].center_freq = \
 					ieee80211_channel_to_frequency(Cfg80211_Chan[IdLoop]);
+#else
+		pChannels[IdLoop].center_freq = \
+					ieee80211_channel_to_frequency(Cfg80211_Chan[IdLoop],
+						(IdLoop<CFG80211_NUM_OF_CHAN_2GHZ)?IEEE80211_BAND_2GHZ:IEEE80211_BAND_5GHZ);
+#endif
 		pChannels[IdLoop].hw_value = IdLoop;
 
 		if (IdLoop < CFG80211_NUM_OF_CHAN_2GHZ)
@@ -3099,7 +3106,11 @@ BOOLEAN CFG80211OS_ChanInfoInit(
 	else
 		pChan->band = IEEE80211_BAND_2GHZ;
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39))
 	pChan->center_freq = ieee80211_channel_to_frequency(ChanId);
+#else
+	pChan->center_freq = ieee80211_channel_to_frequency(ChanId, pChan->band);
+#endif
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,32)
 	if (FlgIsNMode == TRUE)
@@ -3151,9 +3162,13 @@ VOID CFG80211OS_Scaning(
 	UINT32 IdChan;
 	UINT32 CenFreq;
 
-
 	/* get channel information */
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39))
 	CenFreq = ieee80211_channel_to_frequency(ChanId);
+#else
+	CenFreq = ieee80211_channel_to_frequency(ChanId,
+		(ChanId<CFG80211_NUM_OF_CHAN_2GHZ)?IEEE80211_BAND_2GHZ:IEEE80211_BAND_5GHZ);
+#endif
 
 	for(IdChan=0; IdChan<MAX_NUM_OF_CHANNELS; IdChan++)
 	{
@@ -3176,7 +3191,7 @@ VOID CFG80211OS_Scaning(
 								RSSI,
 								GFP_ATOMIC);
 
-	CFG80211DBG(RT_DEBUG_ERROR, ("80211> cfg80211_inform_bss_frame\n"));
+	CFG80211DBG(RT_DEBUG_TRACE, ("80211> cfg80211_inform_bss_frame\n"));
 #endif /* CONFIG_STA_SUPPORT */
 #endif /* LINUX_VERSION_CODE */
 }

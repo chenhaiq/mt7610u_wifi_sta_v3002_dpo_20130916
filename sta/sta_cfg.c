@@ -605,6 +605,14 @@ INT Set_NetworkType_Proc(
 		UCHAR rf_channel, rf_bw;
 		INT ext_ch;
 
+#ifdef RT_CFG80211_SUPPORT
+#ifdef CONFIG_STA_SUPPORT
+		// This helps when doing rmmod in Monitor mode if it was switched from Managed mode in the past
+		DBGPRINT(RT_DEBUG_TRACE, ("MONITOR: LOST_AP_INFORM \n"));
+		RT_CFG80211_LOST_AP_INFORM(pAd);
+#endif
+#endif /* RT_CFG80211_SUPPORT */
+
 #ifdef MONITOR_FLAG_11N_SNIFFER_SUPPORT
 		if (strcmp(arg, "Monitor2") == 0)
 			pAd->StaCfg.BssMonitorFlag |= MONITOR_FLAG_11N_SNIFFER;
@@ -824,6 +832,85 @@ INT Set_DefaultKeyID_Proc(
 
     return TRUE;
 }
+
+
+INT Set_Wep_Key_Proc(
+    IN  PRTMP_ADAPTER   pAdapter,
+    IN  PSTRING         Key,
+    IN  INT             KeyLen,
+    IN  INT             KeyId)
+{
+    int    i;
+    UCHAR  CipherAlg = CIPHER_WEP64;
+	struct wifi_dev *wdev = &pAdapter->StaCfg.wdev;
+	
+    if (wdev->AuthMode >= Ndis802_11AuthModeWPA)
+        return TRUE;    /* do nothing */
+
+    if ((KeyId < 0) || (KeyId > 3))	
+    {
+		DBGPRINT(RT_DEBUG_TRACE, ("Set_Wep_Key_Proc::Invalid KeyId (=%d)\n", KeyId));
+		return FALSE;
+    }	
+
+    switch (KeyLen)
+    {
+        case 5: /* wep 40 Ascii type */
+            pAdapter->SharedKey[BSS0][KeyId].KeyLen = KeyLen;
+            memcpy(pAdapter->SharedKey[BSS0][KeyId].Key, Key, KeyLen);
+            CipherAlg = CIPHER_WEP64;
+            break;
+
+        case 10: /* wep 40 Hex type */
+            for(i=0; i < KeyLen; i++)
+            {
+                if( !isxdigit(*(Key+i)) )
+                    return FALSE;  /*Not Hex value; */
+            }
+            pAdapter->SharedKey[BSS0][KeyId].KeyLen = KeyLen / 2 ;
+            AtoH(Key, pAdapter->SharedKey[BSS0][KeyId].Key, KeyLen / 2);
+            CipherAlg = CIPHER_WEP64;
+            break;
+
+        case 13: /* wep 104 Ascii type */
+            pAdapter->SharedKey[BSS0][KeyId].KeyLen = KeyLen;
+            memcpy(pAdapter->SharedKey[BSS0][KeyId].Key, Key, KeyLen);
+            CipherAlg = CIPHER_WEP128;
+            break;
+
+        case 26: /* wep 104 Hex type */
+            for(i=0; i < KeyLen; i++)
+            {
+                if( !isxdigit(*(Key+i)) )
+                    return FALSE;  /*Not Hex value; */
+            }
+            pAdapter->SharedKey[BSS0][KeyId].KeyLen = KeyLen / 2 ;
+            AtoH(Key, pAdapter->SharedKey[BSS0][KeyId].Key, KeyLen / 2);
+            CipherAlg = CIPHER_WEP128;
+            break;
+			
+        default: /* Invalid argument */
+            DBGPRINT(RT_DEBUG_ERROR, ("Set_Wep_Key_Proc::Invalid argument (=%s)\n", Key));
+            return FALSE;
+    }
+
+    pAdapter->SharedKey[BSS0][KeyId].CipherAlg = CipherAlg;
+
+    /* Set keys (into ASIC) */
+    if (wdev->AuthMode >= Ndis802_11AuthModeWPA)
+        ;   /* not support */
+    else    /* Old WEP stuff */
+    {
+        AsicAddSharedKeyEntry(pAdapter,
+                              0,
+                              0,
+                              &pAdapter->SharedKey[BSS0][KeyId]);
+    }
+
+    return TRUE;
+}
+
+
 
 /* 
     ==========================================================================
@@ -6692,7 +6779,7 @@ RtmpIoctl_rt_ioctl_siwauth(
                 pAd->StaCfg.IEEE8021X = FALSE;
 #endif /* WPA_SUPPLICANT_SUPPORT */
             }
-            else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_PAIRWISE_TKIP)
+/*            else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_PAIRWISE_TKIP)
             {
                 pAd->StaCfg.WepStatus = Ndis802_11Encryption2Enabled;
                 pAd->StaCfg.PairCipher = Ndis802_11Encryption2Enabled;
@@ -6701,6 +6788,16 @@ RtmpIoctl_rt_ioctl_siwauth(
             {
                 pAd->StaCfg.WepStatus = Ndis802_11Encryption3Enabled;
                 pAd->StaCfg.PairCipher = Ndis802_11Encryption3Enabled;
+            }*/
+            else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_PAIRWISE_TKIP)
+            {
+                pAd->StaCfg.WepStatus = Ndis802_11TKIPEnable;
+                pAd->StaCfg.PairCipher = Ndis802_11TKIPEnable;
+            }
+            else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_PAIRWISE_CCMP)
+            {
+                pAd->StaCfg.WepStatus = Ndis802_11AESEnable;
+                pAd->StaCfg.PairCipher = Ndis802_11AESEnable;
             }
             DBGPRINT(RT_DEBUG_TRACE, ("%s::IW_AUTH_CIPHER_PAIRWISE - param->value = %d!\n", __FUNCTION__, pIoctlWpa->value));
             break;
@@ -6713,17 +6810,19 @@ RtmpIoctl_rt_ioctl_siwauth(
             {
                 pAd->StaCfg.GroupCipher = Ndis802_11GroupWEP40Enabled;
             }
-			else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_GROUP_WEP104)
+            else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_GROUP_WEP104)
             {
-				pAd->StaCfg.GroupCipher = Ndis802_11GroupWEP104Enabled;
+                pAd->StaCfg.GroupCipher = Ndis802_11GroupWEP104Enabled;
             }
             else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_GROUP_TKIP)
             {
-                pAd->StaCfg.GroupCipher = Ndis802_11Encryption2Enabled;
+//                pAd->StaCfg.GroupCipher = Ndis802_11Encryption2Enabled;
+                pAd->StaCfg.GroupCipher = Ndis802_11TKIPEnable;
             }
             else if (pIoctlWpa->value == RT_CMD_STA_IOCTL_WPA_GROUP_CCMP)
             {
-                pAd->StaCfg.GroupCipher = Ndis802_11Encryption3Enabled;
+//                pAd->StaCfg.GroupCipher = Ndis802_11Encryption3Enabled;
+                pAd->StaCfg.GroupCipher = Ndis802_11AESEnable;
             }
             DBGPRINT(RT_DEBUG_TRACE, ("%s::IW_AUTH_CIPHER_GROUP - param->value = %d!\n", __FUNCTION__, pIoctlWpa->value));
             break;

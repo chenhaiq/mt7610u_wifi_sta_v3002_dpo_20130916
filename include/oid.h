@@ -679,7 +679,7 @@ typedef enum _NDIS_802_11_PRIVACY_FILTER {
 
 /* Added new encryption types */
 /* Also aliased typedef to new name */
-typedef enum _NDIS_802_11_WEP_STATUS {
+/*typedef enum _NDIS_802_11_WEP_STATUS {
 	Ndis802_11WEPEnabled,
 	Ndis802_11Encryption1Enabled = Ndis802_11WEPEnabled,
 	Ndis802_11WEPDisabled,
@@ -692,7 +692,31 @@ typedef enum _NDIS_802_11_WEP_STATUS {
 	Ndis802_11Encryption2KeyAbsent,
 	Ndis802_11Encryption3Enabled,
 	Ndis802_11Encryption3KeyAbsent,
-	Ndis802_11Encryption4Enabled,	/* TKIP or AES mix */
+	Ndis802_11Encryption4Enabled,	// TKIP or AES mix
+	Ndis802_11Encryption4KeyAbsent,
+	Ndis802_11GroupWEP40Enabled,
+	Ndis802_11GroupWEP104Enabled,
+} NDIS_802_11_WEP_STATUS, *PNDIS_802_11_WEP_STATUS, NDIS_802_11_ENCRYPTION_STATUS, *PNDIS_802_11_ENCRYPTION_STATUS;*/
+
+/* Added new encryption types */
+/* Also aliased typedef to new name */
+typedef enum _NDIS_802_11_WEP_STATUS {
+	Ndis802_11WEPEnabled,
+	Ndis802_11Encryption1Enabled = Ndis802_11WEPEnabled,
+	Ndis802_11WEPDisabled,
+	Ndis802_11EncryptionDisabled = Ndis802_11WEPDisabled,
+	Ndis802_11WEPKeyAbsent,
+	Ndis802_11Encryption1KeyAbsent = Ndis802_11WEPKeyAbsent,
+	Ndis802_11WEPNotSupported,
+	Ndis802_11EncryptionNotSupported = Ndis802_11WEPNotSupported,
+	Ndis802_11TKIPEnable,
+	Ndis802_11Encryption2Enabled = Ndis802_11TKIPEnable,
+	Ndis802_11Encryption2KeyAbsent,
+	Ndis802_11AESEnable,
+	Ndis802_11Encryption3Enabled = Ndis802_11AESEnable,
+	Ndis802_11Encryption3KeyAbsent,
+	Ndis802_11TKIPAESMix,
+	Ndis802_11Encryption4Enabled = Ndis802_11TKIPAESMix,	/* TKIP or AES mix */
 	Ndis802_11Encryption4KeyAbsent,
 	Ndis802_11GroupWEP40Enabled,
 	Ndis802_11GroupWEP104Enabled,

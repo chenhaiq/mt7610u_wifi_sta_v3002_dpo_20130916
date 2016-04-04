@@ -271,6 +271,15 @@ VOID MlmeAssocReqAction(
 	USHORT VarIesOffset = 0;
 	USHORT Status;
 
+
+#ifdef WPA_SUPPLICANT_SUPPORT
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT SUPPLICANT ENABLED\n"));
+#endif
+
+#ifdef NATIVE_WPA_SUPPLICANT_SUPPORT
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT NATIVE SUPPLICANT ENABLED\n"));
+#endif
+
 	/* Block all authentication request durning WPA block period */
 	if (pAd->StaCfg.bBlockAssoc == TRUE) {
 		DBGPRINT(RT_DEBUG_TRACE,
@@ -332,7 +341,7 @@ VOID MlmeAssocReqAction(
 		VarIesOffset += pAd->MlmeAux.SupRateLen;
 		/* End Add by James */
 
-		DBGPRINT(RT_DEBUG_TRACE, ("ASSOC - Send ASSOC request...\n"));
+		DBGPRINT(RT_DEBUG_ERROR, ("ASSOC - Send ASSOC request...\n"));
 		MgtMacHeaderInit(pAd, &AssocHdr, SUBTYPE_ASSOC_REQ, 0, ApAddr,
 							ApAddr);
 
@@ -478,7 +487,7 @@ VOID MlmeAssocReqAction(
 				QosInfo.MaxSPLength = pAd->CommonCfg.MaxSPLength;
 				WmeIe[8] |= *(PUCHAR) & QosInfo;
 			} else {
-				/* The Parameter Set Count is set to ¡§0¡¨ in the association request frames */
+				/* The Parameter Set Count is set to \A1\A70\A1\A8 in the association request frames */
 				/* WmeIe[8] |= (pAd->MlmeAux.APEdcaParm.EdcaUpdateCount & 0x0f); */
 			}
 
@@ -597,6 +606,8 @@ VOID MlmeAssocReqAction(
 			}
 		}
 #ifdef WPA_SUPPLICANT_SUPPORT
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT SUPPLICANT ENABLED\n"));
+
 		/*
 			Can not use SIOCSIWGENIE definition, it is used in wireless.h
 			We will not see the definition in MODULE.
@@ -689,6 +700,14 @@ VOID MlmeReassocReqAction(
 	PUCHAR pOutBuffer = NULL;
 	USHORT Status;
 
+#ifdef WPA_SUPPLICANT_SUPPORT
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT SUPPLICANT ENABLED\n"));
+#endif
+
+#ifdef NATIVE_WPA_SUPPLICANT_SUPPORT
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT NATIVE SUPPLICANT ENABLED\n"));
+#endif
+
 	/* Block all authentication request durning WPA block period */
 	if (pAd->StaCfg.bBlockAssoc == TRUE) {
 		DBGPRINT(RT_DEBUG_TRACE,
@@ -719,7 +738,7 @@ VOID MlmeReassocReqAction(
 		COPY_MAC_ADDR(pAd->MlmeAux.Bssid, ApAddr);
 
 		/* make frame, use bssid as the AP address?? */
-		DBGPRINT(RT_DEBUG_TRACE,
+		DBGPRINT(RT_DEBUG_ERROR,
 			 ("ASSOC - Send RE-ASSOC request...\n"));
 		MgtMacHeaderInit(pAd, &ReassocHdr, SUBTYPE_REASSOC_REQ, 0, ApAddr, 
 							ApAddr);
@@ -967,7 +986,7 @@ VOID MlmeDisassocReqAction(
 
 	RTMPCancelTimer(&pAd->MlmeAux.DisassocTimer, &TimerCancelled);
 
-	DBGPRINT(RT_DEBUG_TRACE,
+	DBGPRINT(RT_DEBUG_ERROR,
 		 ("ASSOC - Send DISASSOC request[BSSID::%02x:%02x:%02x:%02x:%02x:%02x (Reason=%d)\n",
 		  PRINT_MAC(pDisassocReq->Addr), pDisassocReq->Reason));
 	MgtMacHeaderInit(pAd, &DisassocHdr, SUBTYPE_DISASSOC, 0, pDisassocReq->Addr, 
@@ -993,12 +1012,20 @@ VOID MlmeDisassocReqAction(
 	pAd->Mlme.AssocMachine.CurrState = DISASSOC_WAIT_RSP;
 
 #ifdef WPA_SUPPLICANT_SUPPORT
+
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT SUPPLICANT ENABLED\n"));
+
+
 #ifndef NATIVE_WPA_SUPPLICANT_SUPPORT
 	if (pAd->StaCfg.WpaSupplicantUP != WPA_SUPPLICANT_DISABLE) {
 		/*send disassociate event to wpa_supplicant */
 		RtmpOSWrielessEventSend(pAd->net_dev, RT_WLAN_EVENT_CUSTOM,
 					RT_DISASSOC_EVENT_FLAG, NULL, NULL, 0);
 	}
+#else
+
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT NATIVE SUPPLICANT ENABLED\n"));
+
 #endif /* NATIVE_WPA_SUPPLICANT_SUPPORT */
 #endif /* WPA_SUPPLICANT_SUPPORT */
 
@@ -1125,11 +1152,22 @@ VOID PeerAssocRspAction(
 #ifdef LINUX
 #ifdef RT_CFG80211_SUPPORT
 			{
-				PFRAME_802_11 pFrame = (PFRAME_802_11) (Elem->Msg);
+				/*PFRAME_802_11 pFrame = (PFRAME_802_11) (Elem->Msg);
 				RTEnqueueInternalCmd(pAd,
 						     CMDTHREAD_CONNECT_RESULT_INFORM,
 						     &pFrame->Octet[6],
-						     Elem->MsgLen - 6 - sizeof (HEADER_802_11));
+						     Elem->MsgLen - 6 - sizeof (HEADER_802_11));*/
+
+				// THIS IS WHAT MAKES WPA2 WORK WITH SUPPLICANT ON NL80211
+				DBGPRINT(RT_DEBUG_ERROR, ("ASSOC - %s() connect inform\n", __FUNCTION__));
+
+				PFRAME_802_11 pFrame =  (PFRAME_802_11) (Elem->Msg);
+				RT_CFG80211_CONN_RESULT_INFORM(pAd, pAd->MlmeAux.Bssid,
+                                pAd->StaCfg.ReqVarIEs, pAd->StaCfg.ReqVarIELen,
+								&pFrame->Octet[6], 
+								Elem->MsgLen - 6 - sizeof (HEADER_802_11),
+                                TRUE);
+
 			}
 #endif /* RT_CFG80211_SUPPORT */
 #endif /* LINUX */
@@ -1190,7 +1228,7 @@ VOID PeerReassocRspAction(
 			       &NewExtChannelOffset, &EdcaParm, &ExtCapInfo,
 			       &CkipFlag, ie_list)) {
 		if (MAC_ADDR_EQUAL(Addr2, pAd->MlmeAux.Bssid)) {	/* The frame is for me ? */
-			DBGPRINT(RT_DEBUG_TRACE,
+			DBGPRINT(RT_DEBUG_ERROR,
 				 ("REASSOC - receive REASSOC_RSP to me (status=%d)\n", Status));
 			RTMPCancelTimer(&pAd->MlmeAux.ReassocTimer,
 					&TimerCancelled);
@@ -1247,6 +1285,7 @@ VOID PeerReassocRspAction(
 								HtCapabilityLen);
 
 #ifdef WPA_SUPPLICANT_SUPPORT
+				DBGPRINT(RT_DEBUG_ERROR, ("DETECT SUPPLICANT ENABLED"));
 #ifndef NATIVE_WPA_SUPPLICANT_SUPPORT
 				if (pAd->StaCfg.WpaSupplicantUP != WPA_SUPPLICANT_DISABLE) {
 					SendAssocIEsToWpaSupplicant(pAd->net_dev,
@@ -1257,11 +1296,16 @@ VOID PeerReassocRspAction(
 								RT_ASSOC_EVENT_FLAG,
 								NULL, NULL, 0);
 				}
+#else
+				DBGPRINT(RT_DEBUG_ERROR, ("DETECT NATIVE SUPPLICANT ENABLED"));
 #endif /* NATIVE_WPA_SUPPLICANT_SUPPORT */
 #endif /* WPA_SUPPLICANT_SUPPORT */
 
 #ifdef NATIVE_WPA_SUPPLICANT_SUPPORT
 				{
+
+					DBGPRINT(RT_DEBUG_ERROR, ("DETECT NATIVE SUPPLICANT ENABLED0 (send len=%d)\n", pAd->StaCfg.ReqVarIELen));
+
 					wext_notify_event_assoc(pAd->net_dev,
 								pAd->StaCfg.ReqVarIEs,
 								pAd->StaCfg.ReqVarIELen);
@@ -1394,9 +1438,15 @@ VOID AssocPostProc(
 		pAd->MacTab.Content[BSSID_WCID].RSNIE_Len = 0;
 		NdisZeroMemory(pAd->MacTab.Content[BSSID_WCID].RSN_IE, MAX_LEN_OF_RSNIE);
 
+		DBGPRINT(RT_DEBUG_ERROR,
+			 ("ASSOC - AuthMode = %d\n", pAd->StaCfg.AuthMode));
+
 		/* Store appropriate RSN_IE for WPA SM negotiation later */
 		if ((pAd->StaCfg.AuthMode >= Ndis802_11AuthModeWPA)
 		    && (pAd->ScanTab.BssEntry[Idx].VarIELen != 0)) {
+
+			DBGPRINT_ERR(("Storing RSS_IE for WPA SM negotiation later\n"));
+
 			PUCHAR pVIE;
 			USHORT len;
 			PEID_STRUCT pEid;
@@ -1418,7 +1468,7 @@ VOID AssocPostProc(
 					|| pAd->StaCfg.AuthMode == Ndis802_11AuthModeWPAPSK)) {
 					NdisMoveMemory(pAd->MacTab.Content[BSSID_WCID].RSN_IE, pVIE, (pEid->Len + 2));
 					pAd->MacTab.Content[BSSID_WCID].RSNIE_Len = (pEid->Len + 2);
-					DBGPRINT(RT_DEBUG_TRACE,
+					DBGPRINT(RT_DEBUG_ERROR,
 						 ("%s():=> Store RSN_IE for WPA SM negotiation\n", __FUNCTION__));
 				}
 				/* For WPA2/WPA2PSK */
@@ -1428,7 +1478,7 @@ VOID AssocPostProc(
 					     || pAd->StaCfg.AuthMode == Ndis802_11AuthModeWPA2PSK)) {
 					NdisMoveMemory(pAd->MacTab.Content[BSSID_WCID].RSN_IE, pVIE, (pEid->Len + 2));
 					pAd->MacTab.Content[BSSID_WCID].RSNIE_Len = (pEid->Len + 2);
-					DBGPRINT(RT_DEBUG_TRACE,
+					DBGPRINT(RT_DEBUG_ERROR,
 						 ("%s():=> Store RSN_IE for WPA2 SM negotiation\n", __FUNCTION__));
 				}
 
@@ -1437,10 +1487,15 @@ VOID AssocPostProc(
 			}
 
 
+		} else
+		{
+
+			DBGPRINT_ERR(("Not storing RSS_IE\n"));
+
 		}
 
 		if (pAd->MacTab.Content[BSSID_WCID].RSNIE_Len == 0) {
-			DBGPRINT(RT_DEBUG_TRACE,
+			DBGPRINT(RT_DEBUG_ERROR,
 				 ("%s():=> no RSN_IE\n", __FUNCTION__));
 		} else {
 			hex_dump("RSN_IE",
@@ -1468,9 +1523,9 @@ VOID PeerDisassocAction(
 	UCHAR Addr2[MAC_ADDR_LEN];
 	USHORT Reason;
 
-	DBGPRINT(RT_DEBUG_TRACE, ("ASSOC - PeerDisassocAction()\n"));
+	DBGPRINT(RT_DEBUG_ERROR, ("ASSOC - PeerDisassocAction()\n"));
 	if (PeerDisassocSanity(pAd, Elem->Msg, Elem->MsgLen, Addr2, &Reason)) {
-		DBGPRINT(RT_DEBUG_TRACE,
+		DBGPRINT(RT_DEBUG_ERROR,
 			 ("ASSOC - PeerDisassocAction() Reason = %d\n",
 			  Reason));
 		if (INFRA_ON(pAd)
@@ -1501,8 +1556,16 @@ VOID PeerDisassocAction(
 
 #ifdef WPA_SUPPLICANT_SUPPORT
 #ifndef NATIVE_WPA_SUPPLICANT_SUPPORT
+
+		DBGPRINT(RT_DEBUG_ERROR,
+			 ("ASSOC - Send disassoc to WpaSupplicant(1)\n"));
+
 			if (pAd->StaCfg.WpaSupplicantUP !=
 			    WPA_SUPPLICANT_DISABLE) {
+
+				DBGPRINT(RT_DEBUG_ERROR,
+					 ("ASSOC - Send disassoc to WpaSupplicant(2)\n"));
+
 				/*send disassociate event to wpa_supplicant */
 				RtmpOSWrielessEventSend(pAd->net_dev,
 							RT_WLAN_EVENT_CUSTOM,
@@ -1898,7 +1961,16 @@ BOOLEAN StaAddMacTableEntry(
 
 #ifdef WPA_SUPPLICANT_SUPPORT
 #ifndef NATIVE_WPA_SUPPLICANT_SUPPORT
+
+		DBGPRINT(RT_DEBUG_ERROR,
+			 ("ASSOC - Send assoc IEs to WpaSupplicant(0)\n"));
+
+
 	if (pAd->StaCfg.WpaSupplicantUP) {
+
+		DBGPRINT(RT_DEBUG_ERROR,
+			 ("ASSOC - Send assoc IEs to WpaSupplicant(1)\n"));
+
 		SendAssocIEsToWpaSupplicant(pAd->net_dev, pAd->StaCfg.ReqVarIEs,
 					    pAd->StaCfg.ReqVarIELen);
 
@@ -1910,6 +1982,9 @@ BOOLEAN StaAddMacTableEntry(
 #endif /* WPA_SUPPLICANT_SUPPORT */
 
 #ifdef NATIVE_WPA_SUPPLICANT_SUPPORT
+
+	DBGPRINT(RT_DEBUG_ERROR, ("DETECT NATIVE SUPPLICANT ENABLED (send len=%d)\n", pAd->StaCfg.ReqVarIELen));
+
 	{
 /*        union iwreq_data    wrqu; */
 		wext_notify_event_assoc(pAd->net_dev, pAd->StaCfg.ReqVarIEs,

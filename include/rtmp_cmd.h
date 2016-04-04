@@ -330,6 +330,49 @@ typedef enum _CMD_RTPRIV_IOCTL_COMMON {
 } CMD_RTPRIV_IOCTL_COMMON;
 
 #ifdef RT_CFG80211_SUPPORT
+typedef struct __CMD_RTPRIV_IOCTL_80211_VIF_SET {
+	INT  vifType;
+	char vifName[IFNAMSIZ];
+	INT  vifNameLen;
+} CMD_RTPRIV_IOCTL_80211_VIF_SET;
+
+typedef struct __CMD_RTPRIV_IOCTL_80211_BSS_PARM {
+	INT   use_cts_prot;
+	INT   use_short_preamble;
+	INT   use_short_slot_time;
+	UINT8 *basic_rates;
+	UINT8 basic_rates_len;
+	INT   ap_isolate;
+	INT   ht_opmode;	
+
+} CMD_RTPRIV_IOCTL_80211_BSS_PARM;
+
+typedef struct __CMD_RTPRIV_IOCTL_80211_BEACON {
+        INT32 interval;
+        INT32 dtim_period;
+        UCHAR *beacon_head;
+		UCHAR *beacon_tail;
+        UINT32 beacon_head_len; /* Before TIM IE */
+		UINT32 beacon_tail_len; /* After TIM IE */
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0))
+	UCHAR *beacon_ies;
+	UINT32 beacon_ies_len;
+	UCHAR *proberesp_ies;
+	UINT32 proberesp_ies_len;
+	UCHAR *assocresp_ies;
+	UINT32 assocresp_ies_len;
+	UCHAR *probe_resp;
+	UINT32 probe_resp_len;
+	ULONG ssid_len;
+	UCHAR hidden_ssid;
+	struct cfg80211_crypto_settings crypto;
+	BOOLEAN privacy;
+	UCHAR auth_type;
+	INT32 inactivity_timeout;
+#endif
+} CMD_RTPRIV_IOCTL_80211_BEACON;
+
 typedef struct __CMD_RTPRIV_IOCTL_80211_CHAN {
 
 	UINT8 ChanId;
@@ -346,6 +389,10 @@ typedef struct __CMD_RTPRIV_IOCTL_80211_CHAN {
 	UINT8 ChanType;
 
 	UINT32 MonFilterFlag;
+
+//#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0))	
+//	PWIRELESS_DEV pWdev;	
+//#endif /* LINUX_VERSION_CODE: 3.6.0 */
 } CMD_RTPRIV_IOCTL_80211_CHAN;
 
 #define RT_CMD_80211_FILTER_FCSFAIL		0x01
@@ -375,25 +422,45 @@ typedef struct __CMD_RTPRIV_IOCTL_80211_STA {
 	UINT32 InactiveTime;
 } CMD_RTPRIV_IOCTL_80211_STA;
 
-typedef struct __CMD_RTPRIV_IOCTL_80211_KEY {
+/*typedef struct __CMD_RTPRIV_IOCTL_80211_KEY {
 
 #define RT_CMD_80211_KEY_WEP			0x00
 #define RT_CMD_80211_KEY_WPA			0x01
 	UINT8 KeyType;
 	UINT8 KeyBuf[50];
 	UINT8 KeyId;
+} CMD_RTPRIV_IOCTL_80211_KEY;*/
+
+#define RT_CMD_80211_KEY_WEP40			0x00
+#define RT_CMD_80211_KEY_WEP104			0x01
+#define RT_CMD_80211_KEY_WPA			0x02
+#ifdef DOT11W_PMF_SUPPORT
+#define RT_CMD_80211_KEY_AES_CMAC	0x03
+#endif /* DOT11W_PMF_SUPPORT */
+
+typedef struct __CMD_RTPRIV_IOCTL_80211_KEY {
+	UINT8 KeyType;
+	UINT8 KeyBuf[50];
+	UINT8 KeyId;
+	BOOLEAN bPairwise;
+	UINT8 KeyLen;
+	UINT32 cipher;
+	UINT8 MAC[ETH_LENGTH_OF_ADDRESS];
 } CMD_RTPRIV_IOCTL_80211_KEY;
 
-typedef struct __CMD_RTPRIV_IOCTL_80211_CONNECT {
-
-	UINT8 WpaVer;
-	BOOLEAN FlgIs8021x;
-	BOOLEAN FlgIsAuthOpen;
 
 #define RT_CMD_80211_CONN_ENCRYPT_NONE	0x01
 #define RT_CMD_80211_CONN_ENCRYPT_WEP	0x02
 #define RT_CMD_80211_CONN_ENCRYPT_TKIP	0x04
 #define RT_CMD_80211_CONN_ENCRYPT_CCMP	0x08
+
+typedef struct __CMD_RTPRIV_IOCTL_80211_CONNECT {
+
+	UINT8 WpaVer;
+	BOOLEAN FlgIs8021x;
+	UINT8 AuthType;
+	//BOOLEAN FlgIsAuthOpen;
+
 	UINT8 PairwiseEncrypType;
 	UINT8 GroupwiseEncrypType;
 
@@ -403,6 +470,17 @@ typedef struct __CMD_RTPRIV_IOCTL_80211_CONNECT {
 
 	UINT8 *pSsid;
 	UINT32 SsidLen;
+
+
+
+
+	UINT8 *pBssid;  
+	
+	BOOLEAN bWpsConnection;
+#ifdef DOT11W_PMF_SUPPORT
+	BOOLEAN mfp;
+#endif /* DOT11W_PMF_SUPPORT */
+
 } CMD_RTPRIV_IOCTL_80211_CONNECT;
 
 typedef struct __CMD_RTPRIV_IOCTL_80211_REG_NOTIFY {
