@@ -985,7 +985,14 @@ INT RTMP_COM_IoctlHandle(
 
 			VIRTUAL_IF_DEC(pAd);
 			if (VIRTUAL_IF_NUM(pAd) == 0)
+			{
+				// When this occurs, it seems like most kernel code will want
+				// the scan to end. If this call is not here, we get both
+				// a kernel warning, and later an error when we try to end the
+				// scan later in the code.
+				CFG80211OS_ScanEnd(pAd->pCfg80211_CB, false);
 				pInfConf->rt28xx_close(pAd->net_dev);
+			}
 		}
 			break;
 

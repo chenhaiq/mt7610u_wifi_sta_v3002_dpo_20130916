@@ -1652,6 +1652,7 @@ BOOLEAN CFG80211_Register(
 	/* allocate wireless device */
 	RTMP_DRIVER_80211_BANDINFO_GET(pAd, &BandInfo);
 
+	pCfg80211_CB->pCfg80211_ScanReq = NULL;
 	pCfg80211_CB->pCfg80211_Wdev = \
 				CFG80211_WdevAlloc(pCfg80211_CB, &BandInfo, pAd, pDev);
 	if (pCfg80211_CB->pCfg80211_Wdev == NULL)
