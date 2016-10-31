@@ -990,7 +990,10 @@ INT RTMP_COM_IoctlHandle(
 				// the scan to end. If this call is not here, we get both
 				// a kernel warning, and later an error when we try to end the
 				// scan later in the code.
+
+#ifdef RT_CFG80211_SUPPORT
 				CFG80211OS_ScanEnd(pAd->pCfg80211_CB, false);
+#endif
 				pInfConf->rt28xx_close(pAd->net_dev);
 			}
 		}
