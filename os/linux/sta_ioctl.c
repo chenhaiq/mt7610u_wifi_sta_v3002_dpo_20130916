@@ -587,7 +587,10 @@ int rt_ioctl_giwap(struct net_device *dev,
 	if (RTMP_DRIVER_IOCTL_SANITY_CHECK(pAd, NULL) != NDIS_STATUS_SUCCESS)
     {
         DBGPRINT(RT_DEBUG_TRACE, ("INFO::Network is down!\n"));
-        return -ENETDOWN;   
+		// callers like NetworkManager expect to be able to read a valid mode
+		// even when down
+		*mode = IW_MODE_INFRA;
+		return 0;
     }
 
 
