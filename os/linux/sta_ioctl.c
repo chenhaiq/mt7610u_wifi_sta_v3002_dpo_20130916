@@ -268,7 +268,8 @@ int rt_ioctl_giwmode(struct net_device *dev,
 	if (RTMP_DRIVER_IOCTL_SANITY_CHECK(pAd, NULL) != NDIS_STATUS_SUCCESS)
     {
         DBGPRINT(RT_DEBUG_TRACE, ("INFO::Network is down!\n"));
-        return -ENETDOWN;   
+		*mode = IW_MODE_INFRA;
+		return 0;
     }
 
 
@@ -693,7 +694,7 @@ int rt_ioctl_iwaplist(struct net_device *dev,
 		set_quality(pAd, &qual[i], pList); /*&pAd->ScanTab.BssEntry[i]); */
 	}
 	data->length = i;
-	memcpy(extra, &addr, i*sizeof(addr[0]));
+	memcpy(extra, addr, i*sizeof(addr[0]));
 	data->flags = 1;		/* signal quality present (sort of) */
 	memcpy(extra + i*sizeof(addr[0]), &qual, i*sizeof(qual[i]));
 
