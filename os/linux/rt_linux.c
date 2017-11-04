@@ -38,8 +38,8 @@
 #endif
 
 #include <linux/slab.h>
-#define __vfs_read(a,b,c,d) vfs_read(a,b,c,d)
-#define __vfs_write(a,b,c,d) vfs_write(a,b,c,d)
+#define __vfs_read(a,b,c,d) kernel_read(a,b,c,d)
+#define __vfs_write(a,b,c,d) kernel_write(a,b,c,d)
 
 /* TODO */
 #undef RT_CONFIG_IF_OPMODE_ON_AP
