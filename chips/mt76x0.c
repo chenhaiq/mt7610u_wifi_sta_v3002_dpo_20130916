@@ -2111,9 +2111,7 @@ INT MT76x0_ReadChannelPwr(RTMP_ADAPTER *pAd)
 
 	{
 		/* 1. U-NII lower/middle band: 36, 38, 40; 44, 46, 48; 52, 54, 56; 60, 62, 64 (including central frequency in BW 40MHz)*/
-		ASSERT((pAd->TxPower[choffset].Channel == 36));
 		choffset = 14;
-		ASSERT((pAd->TxPower[choffset].Channel == 36));
 		for (i = 0; i < 6; i++)
 		{
 			idx = i * 2;

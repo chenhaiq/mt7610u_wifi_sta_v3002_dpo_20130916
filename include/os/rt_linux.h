@@ -530,7 +530,7 @@ typedef struct tasklet_struct  *POS_NET_TASK_STRUCT;
 typedef struct timer_list	OS_NDIS_MINIPORT_TIMER;
 typedef struct timer_list	OS_TIMER;
 
-typedef void (*TIMER_FUNCTION)(unsigned long);
+typedef void (*TIMER_FUNCTION)(struct timer_list *);
 
 
 #define OS_WAIT(_time) \
