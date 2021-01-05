@@ -710,7 +710,11 @@ static int CFG80211_OpsStaGet(
 	{
 		pSinfo->txrate.flags = RATE_INFO_FLAGS_MCS;
 		if (StaInfo.TxRateFlags & RT_CMD_80211_TXRATE_BW_40)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0))
+			pSinfo->txrate.bw = RATE_INFO_BW_40;
+#else
 			pSinfo->txrate.flags |= RATE_INFO_FLAGS_40_MHZ_WIDTH;
+#endif
 		/* End of if */
 		if (StaInfo.TxRateFlags & RT_CMD_80211_TXRATE_SHORT_GI)
 			pSinfo->txrate.flags |= RATE_INFO_FLAGS_SHORT_GI;
@@ -723,11 +727,20 @@ static int CFG80211_OpsStaGet(
 		pSinfo->txrate.legacy = StaInfo.TxRateMCS;
 	} /* End of if */
 
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0))
+	pSinfo->filled |= BIT(NL80211_STA_INFO_TX_BITRATE);
+#else
 	pSinfo->filled |= STATION_INFO_TX_BITRATE;
+#endif
 
 	/* fill signal */
 	pSinfo->signal = StaInfo.Signal;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0))
+	pSinfo->filled |= BIT(NL80211_STA_INFO_SIGNAL);
+#else
 	pSinfo->filled |= STATION_INFO_SIGNAL;
+#endif
 
 
 	return 0;
@@ -1259,10 +1272,17 @@ static int CFG80211_OpsSurveyGet(
 
 	/* return the information to upper layer */
 	pSurvey->channel = ((CFG80211_CB *)(SurveyInfo.pCfg80211))->pCfg80211_Channels;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0))
+	pSurvey->filled = SURVEY_INFO_TIME_BUSY |
+						SURVEY_INFO_TIME_EXT_BUSY;
+	pSurvey->time_busy = SurveyInfo.ChannelTimeBusy; /* unit: us */
+	pSurvey->time_ext_busy = SurveyInfo.ChannelTimeExtBusy;
+#else
 	pSurvey->filled = SURVEY_INFO_CHANNEL_TIME_BUSY |
 						SURVEY_INFO_CHANNEL_TIME_EXT_BUSY;
 	pSurvey->channel_time_busy = SurveyInfo.ChannelTimeBusy; /* unit: us */
 	pSurvey->channel_time_ext_busy = SurveyInfo.ChannelTimeExtBusy;
+#endif
 
 	CFG80211DBG(RT_DEBUG_ERROR, ("80211> busy time = %ld %ld\n",
 				(ULONG)SurveyInfo.ChannelTimeBusy,
@@ -1409,7 +1429,10 @@ static int CFG80211_OpsPmksaFlush(
 
 struct cfg80211_ops CFG80211_Ops = {
 	/* set channel for a given wireless interface */
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 	.set_channel				= CFG80211_OpsChannelSet,
+#endif
+
 	/* change type/configuration of virtual interface */
 	.change_virtual_intf		= CFG80211_OpsVirtualInfChg,
 
@@ -1593,6 +1616,9 @@ static struct wireless_dev *CFG80211_WdevAlloc(
 	pWdev->wiphy->cipher_suites = CipherSuites;
 	pWdev->wiphy->n_cipher_suites = ARRAY_SIZE(CipherSuites);
 #endif /* LINUX_VERSION_CODE */
+
+	/* @WIPHY_FLAG_NETNS_OK: if not set, do not allow changing the netns of this wiphy at all */
+    pWdev->wiphy->flags |=WIPHY_FLAG_NETNS_OK;
 
 	if (wiphy_register(pWdev->wiphy) < 0)
 	{
